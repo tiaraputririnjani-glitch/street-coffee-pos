@@ -142,7 +142,7 @@
                 <button id="btn-checkout" class="w-full bg-orange-500 text-white py-3 md:py-4 rounded-2xl md:rounded-3xl font-black text-lg hover:bg-orange-600 shadow-lg shadow-orange-100 transition-all active:scale-95 disabled:bg-gray-100 disabled:text-gray-300 disabled:shadow-none disabled:cursor-not-allowed" disabled>Bayar Sekarang</button>
             </div>
 
-            <div class="mt-4 md:mt-8 pt-4 md:pt-6 border-t border-gray-100 overflow-y-auto max-h-40 md:max-h-56 pr-1 hidden md:block">
+            <div class="mt-4 md:mt-8 pt-4 md:pt-6 border-t border-gray-100 overflow-y-auto max-h-64 pr-1">
                 <h3 class="font-black text-gray-800 mb-3 md:mb-4 flex items-center text-xs md:text-sm uppercase tracking-widest">📦 Inventory Status</h3>
                 <div class="grid grid-cols-2 md:grid-cols-1 gap-2">
                     @foreach($stokBahan as $bahan)
