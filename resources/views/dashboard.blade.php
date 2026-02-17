@@ -265,7 +265,7 @@
                 alert('Error koneksi! Pastikan internet lancar.');
                 btn.disabled = false; btn.innerText = 'Bayar Sekarang';
             });
-        });
+        }); 
 
         function closeReceipt() { window.location.reload(); }
     </script>
