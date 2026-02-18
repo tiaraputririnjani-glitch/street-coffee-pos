@@ -19,11 +19,8 @@
         }
         #receipt-modal { transition: opacity 0.3s ease-out; }
         #modal-content { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        /* Hide scrollbar for Chrome, Safari and Opera */
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        /* Hide scrollbar for IE, Edge and Firefox */
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        /* Custom scrollbar agar lebih rapi di desktop */
         @media (min-width: 768px) {
             ::-webkit-scrollbar { width: 5px; height: 5px; }
             ::-webkit-scrollbar-track { background: transparent; }
@@ -43,6 +40,24 @@
         </div>
 
         <div class="flex-1 p-4 md:p-8 overflow-y-auto md:h-full">
+            
+            <div class="space-y-3 mb-6">
+                @foreach($stokBahan as $bahan)
+                    @if($bahan->stok <= $bahan->min_stok)
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-2xl shadow-sm animate-pulse flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-4">⚠️</span>
+                                <div>
+                                    <h4 class="text-xs md:text-sm font-black text-red-800 uppercase tracking-tight">Peringatan: {{ $bahan->nama_bahan }}</h4>
+                                    <p class="text-[10px] md:text-xs text-red-600 font-medium">Sisa {{ number_format($bahan->stok) }} {{ $bahan->satuan }}. Segera restok ya!</p>
+                                </div>
+                            </div>
+                            <span class="bg-red-500 text-white text-[9px] font-black px-2 py-1 rounded-lg uppercase">Kritis</span>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 space-y-4 md:space-y-0">
                 <div>
                     <h1 class="text-xl md:text-2xl font-bold text-gray-800">Street Coffee Menu</h1>
@@ -73,7 +88,7 @@
                 @endforeach
             </div>
 
-            <div class="bg-white rounded-3xl p-4 md:p-8 shadow-sm border border-gray-100 hidden xs:block">
+            <div class="bg-white rounded-3xl p-4 md:p-8 shadow-sm border border-gray-100 mt-6 block">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-lg md:text-xl font-extrabold text-gray-800 tracking-tight">📋 Riwayat Pesanan Hari Ini</h2>
                     <span class="text-[10px] font-black text-orange-500 bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest">Live History</span>
@@ -142,14 +157,14 @@
                 <button id="btn-checkout" class="w-full bg-orange-500 text-white py-3 md:py-4 rounded-2xl md:rounded-3xl font-black text-lg hover:bg-orange-600 shadow-lg shadow-orange-100 transition-all active:scale-95 disabled:bg-gray-100 disabled:text-gray-300 disabled:shadow-none disabled:cursor-not-allowed" disabled>Bayar Sekarang</button>
             </div>
 
-            <div class="mt-4 md:mt-8 pt-4 md:pt-6 border-t border-gray-100 overflow-y-auto max-h-64 pr-1">
+            <div class="mt-4 md:mt-8 pt-4 md:pt-6 border-t border-gray-100 overflow-y-auto max-h-64 pr-1 no-scrollbar">
                 <h3 class="font-black text-gray-800 mb-3 md:mb-4 flex items-center text-xs md:text-sm uppercase tracking-widest">📦 Inventory Status</h3>
                 <div class="grid grid-cols-2 md:grid-cols-1 gap-2">
                     @foreach($stokBahan as $bahan)
                     <div class="flex justify-between items-center p-2 md:p-3 bg-gray-50 rounded-xl md:rounded-2xl group hover:bg-white hover:shadow-sm transition-all">
                         <span class="font-bold text-gray-600 text-[10px] md:text-xs truncate mr-2">{{ $bahan->nama_bahan }}</span>
                         <span class="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter whitespace-nowrap
-                            {{ $bahan->stok <= $bahan->min_stok ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700' }}">
+                            {{ $bahan->stok <= $bahan->min_stok ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-green-100 text-green-700' }}">
                             {{ number_format($bahan->stok) }} {{ $bahan->satuan }}
                         </span>
                     </div>
@@ -177,9 +192,6 @@
     </div>
 
     <script>
-        // =============================================
-        // KODINGAN JAVASCRIPT (TIDAK ADA PERUBAHAN)
-        // =============================================
         let cart = [];
 
         document.querySelectorAll('.add-to-cart').forEach(button => {
@@ -190,7 +202,6 @@
                 const existingItem = cart.find(item => item.id === id);
                 if (existingItem) { existingItem.qty++; } else { cart.push({ id, name, price, qty: 1 }); }
                 updateCartUI();
-                // Efek getar di HP saat tambah item (opsional)
                 if (navigator.vibrate) navigator.vibrate(50);
             });
         });
@@ -212,7 +223,6 @@
                 </div>`;
             });
             container.innerHTML = html; totalDisplay.innerText = `Rp ${total.toLocaleString()}`; btnCheckout.disabled = false;
-            // Scroll otomatis ke bawah keranjang saat item ditambah
             container.scrollTop = container.scrollHeight;
         }
 
