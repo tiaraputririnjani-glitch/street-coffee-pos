@@ -67,7 +67,7 @@
                 </div>
                 @if(Auth::user()->role == 'admin')
                 <div class="bg-orange-500 p-3 md:p-4 rounded-2xl shadow-lg shadow-orange-100 text-white text-right">
-                    <span class="text-[9px] uppercase font-black opacity-70 block">Omzet Hari Ini</span>
+                    <span class="text-[9px] uppercase font-black opacity-70 block tracking-wider">Pendapatan Hari Ini</span>
                     <span class="text-lg font-black">Rp {{ number_format($pendapatan) }}</span>
                 </div>
                 @endif
@@ -119,10 +119,10 @@
             @endif
         </div>
 
-        <div class="w-full md:w-96 bg-white p-6 shadow-2xl flex flex-col border-l border-gray-50 md:h-full z-20 overflow-y-auto no-scrollbar">
+        <div class="w-full md:w-96 bg-white p-6 shadow-2xl flex flex-col border-l border-gray-50 md:h-full z-20">
             <h2 class="text-xl font-black text-gray-800 mb-6 flex items-center"><span class="mr-2">🛒</span> Keranjang</h2>
             
-            <div class="space-y-4 mb-6">
+            <div class="space-y-4 mb-4">
                 <div>
                     <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Nama Customer</label>
                     <input type="text" id="customer-name" placeholder="Siapa namanya?..." class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm">
@@ -138,27 +138,27 @@
                 </div>
             </div>
 
-            <div id="cart-container" class="flex-1 min-h-[200px] mb-6 space-y-3">
+            <div id="cart-container" class="flex-1 overflow-y-auto mb-4 space-y-3 no-scrollbar pr-1">
                 <div class="flex flex-col items-center justify-center h-full text-gray-300 italic text-sm py-10">
                     <p>Belum ada pesanan...</p>
                 </div>
             </div>
 
-            <div class="border-t border-gray-50 pt-6 space-y-4">
+            <div class="border-t border-gray-50 pt-4 space-y-4">
                 <div class="flex justify-between items-center">
-                    <span class="text-xs font-black text-gray-400 uppercase">Total Bayar</span>
+                    <span class="text-xs font-black text-gray-400 uppercase tracking-tighter">Total Bayar</span>
                     <span id="cart-total" class="text-2xl font-black text-orange-600">Rp 0</span>
                 </div>
                 <button id="btn-checkout" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-lg shadow-lg shadow-orange-100 hover:bg-orange-600 active:scale-95 transition-all disabled:bg-gray-100 disabled:text-gray-300 disabled:shadow-none" disabled>BAYAR SEKARANG</button>
             </div>
 
-            <div class="mt-8 pt-6 border-t border-gray-50">
-                <h3 class="text-[10px] font-black text-gray-400 uppercase mb-4">Status Gudang</h3>
+            <div class="mt-6 pt-4 border-t border-gray-50 overflow-y-auto no-scrollbar">
+                <h3 class="text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Status Gudang</h3>
                 <div class="grid grid-cols-1 gap-2">
-                    @foreach($stokBahan->take(5) as $bahan)
-                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
+                    @foreach($stokBahan as $bahan)
+                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors">
                         <span class="text-[10px] font-bold text-gray-500">{{ $bahan->nama_bahan }}</span>
-                        <span class="text-[10px] font-black {{ $bahan->stok <= $bahan->min_stok ? 'text-red-500' : 'text-green-600' }}">{{ number_format($bahan->stok) }}</span>
+                        <span class="text-[10px] font-black {{ $bahan->stok <= $bahan->min_stok ? 'text-red-500 animate-pulse' : 'text-green-600' }}">{{ number_format($bahan->stok) }} {{ $bahan->satuan }}</span>
                     </div>
                     @endforeach
                 </div>
@@ -174,7 +174,7 @@
                 <p class="text-[10px] font-bold opacity-60 uppercase tracking-widest">Digital Receipt</p>
             </div>
             <div class="p-8 space-y-4 text-xs font-mono text-gray-600">
-                <div class="flex justify-between border-b border-dashed pb-2"><span>Customer:</span><span id="receipt-customer" class="font-black text-gray-900"></span></div>
+                <div class="flex justify-between border-b border-dashed pb-2"><span>Customer:</span><span id="receipt-customer" class="font-black text-gray-900 text-right"></span></div>
                 <div class="flex justify-between border-b border-dashed pb-2"><span>Method:</span><span id="receipt-method" class="font-black text-gray-900"></span></div>
                 <div id="receipt-items" class="py-2 space-y-2 max-h-40 overflow-y-auto"></div>
                 <div class="border-t-2 pt-4 flex justify-between text-lg font-black text-gray-900"><span>TOTAL</span><span id="receipt-total" class="text-orange-600"></span></div>
@@ -186,22 +186,17 @@
     <script>
         let cart = [];
 
-        // Fungsi Tambah ke Keranjang
         document.querySelectorAll('.add-to-cart').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
                 const name = btn.getAttribute('data-name');
                 const price = parseInt(btn.getAttribute('data-price'));
-                
                 const exists = cart.find(i => i.id === id);
-                if(exists) exists.qty++;
-                else cart.push({id, name, price, qty: 1});
-                
+                if(exists) exists.qty++; else cart.push({id, name, price, qty: 1});
                 updateCartUI();
             });
         });
 
-        // UPDATE TAMPILAN KERANJANG (SUDAH DIPERBAIKI)
         function updateCartUI() {
             const container = document.getElementById('cart-container');
             const totalDisplay = document.getElementById('cart-total');
@@ -209,19 +204,16 @@
 
             if(cart.length === 0) {
                 container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-300 italic text-sm py-10"><p>Belum ada pesanan...</p></div>`;
-                totalDisplay.innerText = "Rp 0";
-                btnPay.disabled = true;
-                return;
+                totalDisplay.innerText = "Rp 0"; btnPay.disabled = true; return;
             }
 
-            let html = '';
-            let total = 0;
+            let html = ''; let total = 0;
             cart.forEach((item, index) => {
                 total += (item.price * item.qty);
                 html += `
                 <div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl border border-gray-100 cart-item-enter">
                     <div class="flex-1 min-w-0 pr-2">
-                        <p class="font-bold text-gray-800 text-xs truncate uppercase">${item.name}</p>
+                        <p class="font-bold text-gray-800 text-[11px] truncate uppercase">${item.name}</p>
                         <p class="text-[9px] text-gray-400 font-bold">${item.qty}x @ Rp ${item.price.toLocaleString()}</p>
                     </div>
                     <div class="flex items-center space-x-3">
@@ -238,27 +230,22 @@
 
         function removeItem(i) { cart.splice(i, 1); updateCartUI(); }
 
-        // Filter Menu
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const target = btn.getAttribute('data-target');
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.replace('bg-orange-100','text-gray-400'));
                 btn.classList.add('bg-orange-100', 'text-orange-600');
-                
                 document.querySelectorAll('.menu-item').forEach(item => {
                     item.style.display = (target === 'all' || item.dataset.category === target) ? 'block' : 'none';
                 });
             });
         });
 
-        // Proses Bayar
         document.getElementById('btn-checkout').addEventListener('click', function() {
             const name = document.getElementById('customer-name').value;
             const method = document.getElementById('payment-method').value;
             if(!name) return alert('Isi nama pelanggan dulu ya!');
-
-            this.disabled = true;
-            this.innerText = 'MEMPROSES...';
+            this.disabled = true; this.innerText = 'MEMPROSES...';
 
             fetch("{{ route('checkout') }}", {
                 method: "POST",
@@ -271,11 +258,9 @@
                     document.getElementById('receipt-customer').innerText = name;
                     document.getElementById('receipt-method').innerText = method;
                     document.getElementById('receipt-total').innerText = document.getElementById('cart-total').innerText;
-                    
                     let itemsHtml = '';
                     cart.forEach(i => itemsHtml += `<div class="flex justify-between"><span>${i.name} x${i.qty}</span><span>Rp ${(i.price*i.qty).toLocaleString()}</span></div>`);
                     document.getElementById('receipt-items').innerHTML = itemsHtml;
-
                     const modal = document.getElementById('receipt-modal');
                     modal.classList.remove('hidden');
                     setTimeout(() => document.getElementById('modal-content').classList.replace('opacity-0','opacity-100'), 50);
