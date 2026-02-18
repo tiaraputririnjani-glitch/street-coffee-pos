@@ -40,7 +40,7 @@
             
             <form action="{{ route('logout') }}" method="POST" class="md:mt-auto">
                 @csrf
-                <button type="submit" class="p-3 text-gray-400 hover:text-red-500 transition-colors" title="Logout">
+                <button type="submit" class="p-2 md:p-3 text-gray-400 hover:text-red-500 transition-colors" title="Logout">
                     <span class="text-xl">🚪</span>
                 </button>
             </form>
@@ -56,7 +56,7 @@
                                 <span class="text-2xl mr-4">⚠️</span>
                                 <div>
                                     <h4 class="text-xs md:text-sm font-black text-red-800 uppercase tracking-tight">Peringatan: {{ $bahan->nama_bahan }}</h4>
-                                    <p class="text-[10px] md:text-xs text-red-600 font-medium">Sisa {{ number_format($bahan->stok) }} {{ $bahan->satuan }}. Segera restok ya!</p>
+                                    <p class="text-[10px] md:text-xs text-red-600 font-medium">Sisa {{ number_format($bahan->stok) }} {{ $bahan->satuan }}. Segera restok!</p>
                                 </div>
                             </div>
                             <span class="bg-red-500 text-white text-[9px] font-black px-2 py-1 rounded-lg uppercase">Kritis</span>
@@ -68,7 +68,7 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 space-y-4 md:space-y-0">
                 <div>
                     <h1 class="text-xl md:text-2xl font-bold text-gray-800">Halo, {{ Auth::user()->name }}!</h1>
-                    <p class="text-gray-500 text-xs md:text-sm">Siap melayani pelanggan hari ini?</p>
+                    <p class="text-gray-500 text-xs md:text-sm">Siap melayani pelanggan Street Coffee?</p>
                 </div>
                 
                 @if(Auth::user()->role == 'admin')
@@ -148,7 +148,7 @@
                     <option value="Cash">💵 Cash</option>
                     <option value="Dana">💙 Dana</option>
                     <option value="Gopay">💚 Gopay</option>
-                    <option value="Kartu">💳 Kartu Debit/Kredit</option>
+                    <option value="Kartu">💳 Kartu</option>
                 </select>
             </div>
 
@@ -213,23 +213,39 @@
             });
         });
 
+        // --- FUNGSI KERANJANG YANG SUDAH DIPERBAIKI (TAMPIL GANTENG) ---
         function updateCartUI() {
             const container = document.getElementById('cart-container');
             const totalDisplay = document.getElementById('cart-total');
             const btnCheckout = document.getElementById('btn-checkout');
+
             if (cart.length === 0) {
                 container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-300 italic text-sm"><p>Keranjang masih kosong...</p></div>`;
-                totalDisplay.innerText = "Rp 0"; btnCheckout.disabled = true; return;
+                totalDisplay.innerText = "Rp 0";
+                btnCheckout.disabled = true;
+                return;
             }
-            let html = ''; let total = 0;
+
+            let html = '';
+            let total = 0;
             cart.forEach((item, index) => {
                 total += item.price * item.qty;
-                html += `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100 cart-item-enter">
-                    <div class="flex-1 overflow-hidden"><p class="font-bold text-gray-800 text-sm truncate">${item.name}</p><p class="text-[10px] text-gray-400">${item.qty} pcs x Rp ${item.price.toLocaleString()}</p></div>
-                    <div class="flex items-center space-x-2 ml-2"><span class="font-black text-orange-600 text-sm whitespace-nowrap">Rp ${(item.price * item.qty).toLocaleString()}</span><button onclick="removeFromCart(${index})" class="text-gray-300 hover:text-red-500 font-bold p-1">&times;</button></div>
+                html += `
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100 cart-item-enter mb-2">
+                    <div class="flex-1 overflow-hidden pr-2">
+                        <p class="font-bold text-gray-800 text-sm truncate">${item.name}</p>
+                        <p class="text-[10px] text-gray-400">${item.qty} pcs x Rp ${item.price.toLocaleString()}</p>
+                    </div>
+                    <div class="flex items-center space-x-2 ml-2">
+                        <span class="font-black text-orange-600 text-sm whitespace-nowrap">Rp ${(item.price * item.qty).toLocaleString()}</span>
+                        <button onclick="removeFromCart(${index})" class="text-gray-300 hover:text-red-500 font-bold p-1 text-lg transition-colors">&times;</button>
+                    </div>
                 </div>`;
             });
-            container.innerHTML = html; totalDisplay.innerText = `Rp ${total.toLocaleString()}`; btnCheckout.disabled = false;
+
+            container.innerHTML = html;
+            totalDisplay.innerText = `Rp ${total.toLocaleString()}`;
+            btnCheckout.disabled = false;
             container.scrollTop = container.scrollHeight;
         }
 
@@ -249,6 +265,7 @@
             const paymentMethod = document.getElementById('payment-method').value;
             const totalHargaText = document.getElementById('cart-total').innerText;
             const totalHarga = parseInt(totalHargaText.replace(/[^0-9]/g, ''));
+            
             if (!customerName) {
                 document.getElementById('customer-name').focus();
                 return alert('⚠️ Masukkan nama pelanggan dulu ya!');
