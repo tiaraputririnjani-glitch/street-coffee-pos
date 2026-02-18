@@ -144,7 +144,8 @@
                     <select id="payment-method" class="flex-1 p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm appearance-none">
                         <option value="Cash">💵 Cash</option>
                         <option value="Dana">💙 Dana</option>
-                        <option value="Gopay">💚 Gopay</option>
+                       
+                         <option value="Kartu">💳 Kartu</option>
                     </select>
                     <button id="btn-checkout" class="flex-[2] bg-orange-500 text-white py-3 rounded-xl font-black text-sm shadow-lg shadow-orange-100 hover:bg-orange-600 active:scale-95 transition-all disabled:bg-gray-100 disabled:text-gray-300" disabled>BAYAR</button>
                 </div>
