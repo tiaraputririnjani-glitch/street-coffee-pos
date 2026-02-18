@@ -8,28 +8,20 @@ use App\Models\{BahanBaku, Menu, Recipe, User};
 class StreetCoffeeSeeder extends Seeder {
     public function run(): void {
         
-        // 1. BUAT USER (ADMIN & KASIR) - SESUAI USE CASE
-        // Akun untuk kamu sebagai Owner
+        // 1. BUAT USER (Semua harus di dalam sini!)
+        // Akun Owner (Tiara)
         User::updateOrCreate(
             ['email' => 'tiaraputririnjani@gmail.com'],
-            [
-                'name' => 'Owner Tiara', 
-                'password' => bcrypt('password'), 
-                'role' => 'admin' // Jabatan Admin
-            ]
+            ['name' => 'Owner Tiara', 'password' => bcrypt('password'), 'role' => 'admin']
         );
 
-        // Akun untuk staf kasir
+        // Akun Kasir
         User::updateOrCreate(
             ['email' => 'kasir@streetcoffee.com'],
-            [
-                'name' => 'Kasir Ara', 
-                'password' => bcrypt('password'), 
-                'role' => 'kasir' // Jabatan Kasir
-            ]
+            ['name' => 'Kasir Ara', 'password' => bcrypt('password'), 'role' => 'kasir']
         );
 
-        // 2. DAFTAR BAHAN BAKU (LENGKAP DENGAN SAOS & TOPPING)
+        // 2. DAFTAR BAHAN BAKU
         $bahanList = [
             'Biji Kopi'     => ['stok' => 10000, 'satuan' => 'gram', 'min_stok' => 500],
             'Susu'          => ['stok' => 20000, 'satuan' => 'ml',   'min_stok' => 1000],
@@ -52,7 +44,7 @@ class StreetCoffeeSeeder extends Seeder {
             $createdBahan[$nama] = BahanBaku::updateOrCreate(['nama_bahan' => $nama], $data);
         }
 
-        // 3. DAFTAR MENU
+        // 3. DAFTAR MENU & RESEP
         $list = [
             ['Espresso', 10000, 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400', 'Coffee'],
             ['Americano', 12000, 'https://mataseni.net/wp-content/uploads/2024/12/Mengenal-Caffe-Americano-Minuman-Kopi-Simpel-dengan-Rasa-yang-Kuat-1024x768.jpg', 'Coffee'],
@@ -77,9 +69,10 @@ class StreetCoffeeSeeder extends Seeder {
         foreach ($list as $item) {
             $m = Menu::updateOrCreate(['nama_menu' => $item[0]], ['harga' => $item[1], 'image_url' => $item[2], 'kategori' => $item[3]]);
 
-            // Tambahkan Cup & Resep
+            // Tambahkan Cup untuk minuman
             if ($item[3] != 'Snack') Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Cup']->id], ['jumlah_terpakai' => 1]);
 
+            // Resep Spesifik
             if ($item[0] == 'Toast Bread') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Roti']->id], ['jumlah_terpakai' => 1]);
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Cokelat Meses']->id], ['jumlah_terpakai' => 10]);
