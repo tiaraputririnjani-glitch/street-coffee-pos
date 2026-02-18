@@ -38,7 +38,7 @@
             <button class="filter-btn p-2 md:p-3 text-gray-400 hover:text-orange-600 rounded-xl text-sm flex-shrink-0" data-target="Non-Coffee">Non-Coffee</button>
             <button class="filter-btn p-2 md:p-3 text-gray-400 hover:text-orange-600 rounded-xl text-sm flex-shrink-0" data-target="Snack">Snack</button>
             
-            <form action="{{ route('logout') }}" method="POST" class="mt-auto hidden md:block">
+            <form action="{{ route('logout') }}" method="POST" class="md:mt-auto">
                 @csrf
                 <button type="submit" class="p-3 text-gray-400 hover:text-red-500 transition-colors" title="Logout">
                     <span class="text-xl">🚪</span>
@@ -79,7 +79,7 @@
                 @endif
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-8 md:mb-12">
+            <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-8 md:mb-12">
                 @foreach($menus as $menu)
                 <div class="menu-item bg-white rounded-2xl md:rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 p-3 md:p-4 group" data-category="{{ $menu->kategori }}">
                     <div class="relative overflow-hidden rounded-xl md:rounded-2xl mb-3 md:mb-4">
@@ -105,7 +105,7 @@
                     <span class="text-[10px] font-black text-orange-500 bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest">Live History</span>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left">
+                    <table class="w-full text-left min-w-[500px]">
                         <thead>
                             <tr class="text-gray-400 text-[10px] uppercase tracking-widest border-b border-gray-50">
                                 <th class="pb-4 font-black px-2">Waktu</th>
@@ -118,10 +118,11 @@
                         <tbody class="divide-y divide-gray-50">
                             @foreach($riwayat as $trx)
                             <tr class="text-sm hover:bg-gray-50 transition-colors group">
-                                <td class="py-4 text-gray-400 px-2">{{ $trx->created_at->format('H:i') }}</td>
+                                <td class="py-4 text-gray-400 px-2 whitespace-nowrap">{{ $trx->created_at->format('H:i') }}</td>
                                 <td class="py-4 font-bold text-gray-800 uppercase px-2">{{ $trx->nama_customer }}</td>
-                                <td class="py-4 text-gray-600 italic text-xs max-w-xs truncate leading-relaxed px-2 hidden md:table-cell">
-                                    {{ $trx->item_list }} </td>
+                                <td class="py-4 text-gray-600 italic text-[11px] leading-relaxed px-2">
+                                    {{ $trx->item_list }} 
+                                </td>
                                 <td class="py-4 text-center px-2">
                                     <span class="px-2 py-1 rounded-lg bg-gray-100 text-gray-500 text-[10px] font-black uppercase italic whitespace-nowrap">{{ $trx->metode_pembayaran }}</span>
                                 </td>
@@ -130,12 +131,6 @@
                             @endforeach
                         </tbody>
                     </table>
-                    @if($riwayat->isEmpty())
-                        <div class="flex flex-col items-center py-8 md:py-12 text-gray-300">
-                            <span class="text-4xl mb-2">📒</span>
-                            <p class="italic text-sm">Belum ada transaksi hari ini...</p>
-                        </div>
-                    @endif
                 </div>
             </div>
             @endif
@@ -205,6 +200,7 @@
 
     <script>
         let cart = [];
+
         document.querySelectorAll('.add-to-cart').forEach(button => {
             button.addEventListener('click', () => {
                 const id = button.getAttribute('data-id');
