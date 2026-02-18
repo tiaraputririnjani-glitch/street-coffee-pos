@@ -125,7 +125,7 @@
             <div class="space-y-4 mb-4">
                 <div>
                     <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Nama Customer</label>
-                    <input type="text" id="customer-name" placeholder="Siapa namanya?..." class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm">
+                    <input type="text" id="customer-name" placeholder="nama pelanggan..." class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm">
                 </div>
             </div>
 

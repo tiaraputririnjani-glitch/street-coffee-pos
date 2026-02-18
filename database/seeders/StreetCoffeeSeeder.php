@@ -66,13 +66,29 @@ class StreetCoffeeSeeder extends Seeder {
             ['Dimsum Ayam', 18000, 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=400', 'Snack'],
         ];
 
-        foreach ($list as $item) {
+       foreach ($list as $item) {
             $m = Menu::updateOrCreate(['nama_menu' => $item[0]], ['harga' => $item[1], 'image_url' => $item[2], 'kategori' => $item[3]]);
 
-            // Tambahkan Cup untuk minuman
-            if ($item[3] != 'Snack') Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Cup']->id], ['jumlah_terpakai' => 1]);
+            // 1. SEMUA MINUMAN BUTUH CUP
+            if ($item[3] != 'Snack') {
+                Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Cup']->id], ['jumlah_terpakai' => 1]);
+            }
 
-            // Resep Spesifik
+            // 2. RESEP KOPI (Biji Kopi)
+            // Semua menu kategori 'Coffee' butuh 15gr Biji Kopi
+            if ($item[3] == 'Coffee') {
+                Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Biji Kopi']->id], ['jumlah_terpakai' => 15]);
+            }
+
+            // 3. RESEP SUSU
+            // Menu yang ada kata 'Latte', 'Mocha', 'Cappuccino', 'Susu', 'Macchiato' butuh 150ml Susu
+            if (str_contains($item[0], 'Latte') || str_contains($item[0], 'Susu') || 
+                str_contains($item[0], 'Cappuccino') || str_contains($item[0], 'Mocha') || 
+                str_contains($item[0], 'Macchiato')) {
+                Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Susu']->id], ['jumlah_terpakai' => 150]);
+            }
+
+            // 4. RESEP SNACK (Tetap seperti kemarin)
             if ($item[0] == 'Toast Bread') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Roti']->id], ['jumlah_terpakai' => 1]);
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Cokelat Meses']->id], ['jumlah_terpakai' => 10]);
