@@ -8,6 +8,7 @@ use App\Models\Recipe;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth; // Tambahkan ini
 use Illuminate\View\View;
 
 class TransaksiController extends Controller
@@ -29,9 +30,9 @@ class TransaksiController extends Controller
     }
 
     /**
-     * Menyimpan Transaksi, Daftar Menu, dan Memotong Stok
+     * Menyimpan Transaksi (Nama fungsi diganti jadi 'checkout' agar sinkron dengan route)
      */
-    public function store(Request $request)
+    public function checkout(Request $request)
     {
         // 1. Validasi data
         $request->validate([
@@ -44,17 +45,16 @@ class TransaksiController extends Controller
         return DB::transaction(function () use ($request) {
             try {
                 // 2. Gabungkan nama menu jadi teks untuk kolom 'item_list'
-                // Hasilnya: "Matcha Latte (1x), Pisang Goreng (2x)"
                 $daftarPesanan = collect($request->items)->map(function($item) {
                     return $item['name'] . " (" . $item['qty'] . "x)";
                 })->implode(', ');
 
-                // 3. Simpan Transaksi Utama ke Database
+                // 3. Simpan Transaksi Utama (Gunakan auth()->id() agar sesuai siapa yang login)
                 $transaksi = Transaksi::create([
-                    'user_id' => 1, 
+                    'user_id' => Auth::id(), // <--- BUKAN lagi angka 1, tapi ID yang sedang login
                     'nama_customer' => $request->nama_customer,
                     'metode_pembayaran' => $request->metode_pembayaran,
-                    'item_list' => $daftarPesanan, // <--- DETAIL MENU DISIMPAN DI SINI
+                    'item_list' => $daftarPesanan,
                     'total_harga' => $request->total,
                     'created_at' => now()
                 ]);
