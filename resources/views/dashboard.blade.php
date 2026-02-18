@@ -110,7 +110,7 @@
                             <tr class="text-gray-400 text-[10px] uppercase tracking-widest border-b border-gray-50">
                                 <th class="pb-4 font-black px-2">Waktu</th>
                                 <th class="pb-4 font-black px-2">Customer</th>
-                                <th class="pb-4 font-black px-2 hidden md:table-cell">Pesanan</th>
+                                <th class="pb-4 font-black px-2">Pesanan</th>
                                 <th class="pb-4 font-black text-center px-2">Metode</th>
                                 <th class="pb-4 font-black text-right px-2">Total</th>
                             </tr>
