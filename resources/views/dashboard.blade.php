@@ -52,7 +52,7 @@
                         <div class="bg-white border-l-4 border-red-500 p-3 rounded-r-xl shadow-sm flex items-center justify-between">
                             <div class="flex items-center">
                                 <span class="mr-3">⚠️</span>
-                                <span class="text-xs font-bold text-gray-700">Stok {{ $bahan->nama_bahan }} sisa {{ number_format($bahan->stok) }} {{ $bahan->satuan }}</span>
+                                <span class="text-xs font-bold text-gray-700">Stok {{ $bahan->nama_bahan }} sisa {{ number_format($bahan->stok) }}</span>
                             </div>
                             <span class="text-[9px] font-black text-red-500 uppercase">Restok!</span>
                         </div>
@@ -125,40 +125,38 @@
             <div class="space-y-4 mb-4">
                 <div>
                     <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Nama Customer</label>
-                    <input type="text" id="customer-name" placeholder="nama pelanggan..." class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Pembayaran</label>
-                    <select id="payment-method" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm">
-                        <option value="Cash">💵 Cash</option>
-                        <option value="Dana">💙 Dana</option>
-                        <option value="Gopay">💚 Gopay</option>
-                        <option value="Kartu">💳 Kartu</option>
-                    </select>
+                    <input type="text" id="customer-name" placeholder="Siapa namanya?..." class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm">
                 </div>
             </div>
 
-            <div id="cart-container" class="flex-1 overflow-y-auto mb-4 space-y-3 no-scrollbar pr-1">
+            <div id="cart-container" class="flex-1 min-h-[150px] overflow-y-auto mb-4 space-y-3 no-scrollbar pr-1 border-b border-gray-50">
                 <div class="flex flex-col items-center justify-center h-full text-gray-300 italic text-sm py-10">
                     <p>Belum ada pesanan...</p>
                 </div>
             </div>
 
-            <div class="border-t border-gray-50 pt-4 space-y-4">
+            <div class="pt-4 space-y-4">
                 <div class="flex justify-between items-center">
                     <span class="text-xs font-black text-gray-400 uppercase tracking-tighter">Total Bayar</span>
                     <span id="cart-total" class="text-2xl font-black text-orange-600">Rp 0</span>
                 </div>
-                <button id="btn-checkout" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-lg shadow-lg shadow-orange-100 hover:bg-orange-600 active:scale-95 transition-all disabled:bg-gray-100 disabled:text-gray-300 disabled:shadow-none" disabled>BAYAR SEKARANG</button>
+                <div class="flex space-x-2">
+                    <select id="payment-method" class="flex-1 p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm appearance-none">
+                        <option value="Cash">💵 Cash</option>
+                        <option value="Dana">💙 Dana</option>
+                        <option value="Gopay">💚 Gopay</option>
+                    </select>
+                    <button id="btn-checkout" class="flex-[2] bg-orange-500 text-white py-3 rounded-xl font-black text-sm shadow-lg shadow-orange-100 hover:bg-orange-600 active:scale-95 transition-all disabled:bg-gray-100 disabled:text-gray-300" disabled>BAYAR</button>
+                </div>
             </div>
 
-            <div class="mt-6 pt-4 border-t border-gray-50 overflow-y-auto no-scrollbar">
+            <div class="mt-6 pt-4 border-t border-gray-50 overflow-y-auto no-scrollbar max-h-48">
                 <h3 class="text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Status Gudang</h3>
                 <div class="grid grid-cols-1 gap-2">
                     @foreach($stokBahan as $bahan)
                     <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg hover:bg-orange-50 transition-colors">
                         <span class="text-[10px] font-bold text-gray-500">{{ $bahan->nama_bahan }}</span>
-                        <span class="text-[10px] font-black {{ $bahan->stok <= $bahan->min_stok ? 'text-red-500 animate-pulse' : 'text-green-600' }}">{{ number_format($bahan->stok) }} {{ $bahan->satuan }}</span>
+                        <span class="text-[10px] font-black {{ $bahan->stok <= $bahan->min_stok ? 'text-red-500 animate-pulse' : 'text-green-600' }}">{{ number_format($bahan->stok) }}</span>
                     </div>
                     @endforeach
                 </div>
@@ -175,17 +173,17 @@
             </div>
             <div class="p-8 space-y-4 text-xs font-mono text-gray-600">
                 <div class="flex justify-between border-b border-dashed pb-2"><span>Customer:</span><span id="receipt-customer" class="font-black text-gray-900 text-right"></span></div>
-                <div class="flex justify-between border-b border-dashed pb-2"><span>Method:</span><span id="receipt-method" class="font-black text-gray-900"></span></div>
                 <div id="receipt-items" class="py-2 space-y-2 max-h-40 overflow-y-auto"></div>
                 <div class="border-t-2 pt-4 flex justify-between text-lg font-black text-gray-900"><span>TOTAL</span><span id="receipt-total" class="text-orange-600"></span></div>
             </div>
-            <div class="p-8 pt-0"><button onclick="window.location.reload()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black hover:bg-black transition-all">SELESAI</button></div>
+            <div class="p-8 pt-0"><button onclick="window.location.reload()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black hover:bg-black transition-all uppercase tracking-widest">Selesai</button></div>
         </div>
     </div>
 
     <script>
         let cart = [];
 
+        // Fungsi Tambah Menu
         document.querySelectorAll('.add-to-cart').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
@@ -197,6 +195,7 @@
             });
         });
 
+        // Tampilkan Isi Keranjang
         function updateCartUI() {
             const container = document.getElementById('cart-container');
             const totalDisplay = document.getElementById('cart-total');
@@ -213,12 +212,12 @@
                 html += `
                 <div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl border border-gray-100 cart-item-enter">
                     <div class="flex-1 min-w-0 pr-2">
-                        <p class="font-bold text-gray-800 text-[11px] truncate uppercase">${item.name}</p>
-                        <p class="text-[9px] text-gray-400 font-bold">${item.qty}x @ Rp ${item.price.toLocaleString()}</p>
+                        <p class="font-bold text-gray-800 text-sm truncate uppercase">${item.name}</p>
+                        <p class="text-[10px] text-gray-400 font-bold">${item.qty}x @ Rp ${item.price.toLocaleString()}</p>
                     </div>
                     <div class="flex items-center space-x-3">
                         <span class="text-xs font-black text-orange-600">Rp ${(item.price * item.qty).toLocaleString()}</span>
-                        <button onclick="removeItem(${index})" class="text-gray-300 hover:text-red-500 font-bold text-lg">&times;</button>
+                        <button onclick="removeItem(${index})" class="text-gray-300 hover:text-red-500 font-bold text-xl">&times;</button>
                     </div>
                 </div>`;
             });
@@ -230,6 +229,7 @@
 
         function removeItem(i) { cart.splice(i, 1); updateCartUI(); }
 
+        // Filter Kategori
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const target = btn.getAttribute('data-target');
@@ -241,11 +241,12 @@
             });
         });
 
+        // Proses Bayar
         document.getElementById('btn-checkout').addEventListener('click', function() {
             const name = document.getElementById('customer-name').value;
             const method = document.getElementById('payment-method').value;
             if(!name) return alert('Isi nama pelanggan dulu ya!');
-            this.disabled = true; this.innerText = 'MEMPROSES...';
+            this.disabled = true; this.innerText = 'WAIT...';
 
             fetch("{{ route('checkout') }}", {
                 method: "POST",
@@ -256,13 +257,11 @@
             .then(data => {
                 if(data.success) {
                     document.getElementById('receipt-customer').innerText = name;
-                    document.getElementById('receipt-method').innerText = method;
                     document.getElementById('receipt-total').innerText = document.getElementById('cart-total').innerText;
                     let itemsHtml = '';
                     cart.forEach(i => itemsHtml += `<div class="flex justify-between"><span>${i.name} x${i.qty}</span><span>Rp ${(i.price*i.qty).toLocaleString()}</span></div>`);
                     document.getElementById('receipt-items').innerHTML = itemsHtml;
-                    const modal = document.getElementById('receipt-modal');
-                    modal.classList.remove('hidden');
+                    document.getElementById('receipt-modal').classList.remove('hidden');
                     setTimeout(() => document.getElementById('modal-content').classList.replace('opacity-0','opacity-100'), 50);
                 } else alert('Eror: ' + data.message);
             })
