@@ -19,7 +19,7 @@ class StreetCoffeeSeeder extends Seeder {
             ['name' => 'Kasir Ara', 'password' => bcrypt('password'), 'role' => 'kasir']
         );
 
-        // 2. DAFTAR BAHAN BAKU (Sintaks sudah diperbaiki)
+        // 2. DAFTAR BAHAN BAKU
         $bahanList = [
             'Biji Kopi'     => ['stok' => 10000, 'satuan' => 'gram', 'min_stok' => 500],
             'Susu'          => ['stok' => 20000, 'satuan' => 'ml',   'min_stok' => 1000],
@@ -36,6 +36,8 @@ class StreetCoffeeSeeder extends Seeder {
             'Dimsum'        => ['stok' => 100,   'satuan' => 'pcs',  'min_stok' => 10],
             'Cup'           => ['stok' => 1000,  'satuan' => 'pcs',  'min_stok' => 50],
             'Kentang'       => ['stok' => 5000,  'satuan' => 'gram', 'min_stok' => 500],
+            'Bubuk Taro'    => ['stok' => 2000,  'satuan' => 'gram', 'min_stok' => 100],
+            'Bubuk Red Velvet' => ['stok' => 2000, 'satuan' => 'gram', 'min_stok' => 100],
         ];
 
         $createdBahan = [];
@@ -85,7 +87,22 @@ class StreetCoffeeSeeder extends Seeder {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Susu']->id], ['jumlah_terpakai' => 150]);
             }
 
-            // 4. RESEP MAKANAN (SPESIFIK)
+            // 5. RESEP BUBUK NON-COFFEE (LOGIKA BARU)
+            if ($item[3] == 'Non-Coffee') {
+                if (str_contains($item[0], 'Taro')) {
+                    Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Bubuk Taro']->id], ['jumlah_terpakai' => 20]);
+                } elseif (str_contains($item[0], 'Red Velvet')) {
+                    Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Bubuk Red Velvet']->id], ['jumlah_terpakai' => 20]);
+                } elseif (str_contains($item[0], 'Matcha')) {
+                    Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Bubuk Matcha']->id], ['jumlah_terpakai' => 20]);
+                } elseif (str_contains($item[0], 'Chocolate')) {
+                    Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Bubuk Cokelat']->id], ['jumlah_terpakai' => 25]);
+                } elseif (str_contains($item[0], 'Thai Tea')) {
+                    Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Bubuk Teh']->id], ['jumlah_terpakai' => 20]);
+                }
+            }
+
+            // 4. RESEP MAKANAN
             if ($item[0] == 'Toast Bread') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Roti']->id], ['jumlah_terpakai' => 1]);
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Cokelat Meses']->id], ['jumlah_terpakai' => 10]);
@@ -96,10 +113,10 @@ class StreetCoffeeSeeder extends Seeder {
             } elseif ($item[0] == 'Dimsum Ayam') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Dimsum']->id], ['jumlah_terpakai' => 4]);
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Saus Sambal']->id], ['jumlah_terpakai' => 5]);
-            } elseif ($item[0] == 'French Fries') { // RESEP KENTANG
+            } elseif ($item[0] == 'French Fries') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Kentang']->id], ['jumlah_terpakai' => 150]);
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Saus Sambal']->id], ['jumlah_terpakai' => 5]);
-            } elseif ($item[0] == 'Pisang Goreng') { // RESEP PISANG
+            } elseif ($item[0] == 'Pisang Goreng') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Pisang']->id], ['jumlah_terpakai' => 3]);
             }
         }
