@@ -37,6 +37,13 @@
             <button class="filter-btn p-2 md:p-3 text-gray-400 hover:text-orange-600 rounded-xl text-sm flex-shrink-0" data-target="Coffee">Coffee</button>
             <button class="filter-btn p-2 md:p-3 text-gray-400 hover:text-orange-600 rounded-xl text-sm flex-shrink-0" data-target="Non-Coffee">Non-Coffee</button>
             <button class="filter-btn p-2 md:p-3 text-gray-400 hover:text-orange-600 rounded-xl text-sm flex-shrink-0" data-target="Snack">Snack</button>
+            
+            <form action="{{ route('logout') }}" method="POST" class="mt-auto hidden md:block">
+                @csrf
+                <button type="submit" class="p-3 text-gray-400 hover:text-red-500 transition-colors" title="Logout">
+                    <span class="text-xl">🚪</span>
+                </button>
+            </form>
         </div>
 
         <div class="flex-1 p-4 md:p-8 overflow-y-auto md:h-full">
@@ -60,13 +67,16 @@
 
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 space-y-4 md:space-y-0">
                 <div>
-                    <h1 class="text-xl md:text-2xl font-bold text-gray-800">Street Coffee Menu</h1>
-                    <p class="text-gray-500 text-xs md:text-sm">Pilih menu favorit pelanggan kamu</p>
+                    <h1 class="text-xl md:text-2xl font-bold text-gray-800">Halo, {{ Auth::user()->name }}!</h1>
+                    <p class="text-gray-500 text-xs md:text-sm">Siap melayani pelanggan hari ini?</p>
                 </div>
+                
+                @if(Auth::user()->role == 'admin')
                 <div class="bg-orange-500 text-white px-4 py-2 md:px-6 md:py-3 rounded-xl md:rounded-2xl shadow-lg text-right self-end md:self-auto">
                     <span class="text-[10px] md:text-xs block opacity-80 uppercase tracking-wider">Pendapatan Hari Ini</span>
                     <span class="text-lg md:text-xl font-bold">Rp {{ number_format($pendapatan) }}</span>
                 </div>
+                @endif
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-8 md:mb-12">
@@ -88,6 +98,7 @@
                 @endforeach
             </div>
 
+            @if(Auth::user()->role == 'admin')
             <div class="bg-white rounded-3xl p-4 md:p-8 shadow-sm border border-gray-100 mt-6 block">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-lg md:text-xl font-extrabold text-gray-800 tracking-tight">📋 Riwayat Pesanan Hari Ini</h2>
@@ -127,6 +138,7 @@
                     @endif
                 </div>
             </div>
+            @endif
         </div>
 
         <div class="w-full md:w-96 bg-white p-4 md:p-6 shadow-[0_-5px_15px_-5px_rgba(0,0,0,0.1)] md:shadow-2xl flex flex-col border-t md:border-t-0 md:border-l border-gray-100 md:h-full z-20">
@@ -193,7 +205,6 @@
 
     <script>
         let cart = [];
-
         document.querySelectorAll('.add-to-cart').forEach(button => {
             button.addEventListener('click', () => {
                 const id = button.getAttribute('data-id');

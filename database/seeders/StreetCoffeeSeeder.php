@@ -7,25 +7,42 @@ use App\Models\{BahanBaku, Menu, Recipe, User};
 
 class StreetCoffeeSeeder extends Seeder {
     public function run(): void {
+        
+        // 1. BUAT USER (ADMIN & KASIR) - SESUAI USE CASE
+        // Akun untuk kamu sebagai Owner
         User::updateOrCreate(
             ['email' => 'tiaraputririnjani@gmail.com'],
-            ['name' => 'Tiara', 'password' => bcrypt('password')]
+            [
+                'name' => 'Owner Tiara', 
+                'password' => bcrypt('password'), 
+                'role' => 'admin' // Jabatan Admin
+            ]
         );
 
-        // 1. Tambahkan Saus & Topping di sini
+        // Akun untuk staf kasir
+        User::updateOrCreate(
+            ['email' => 'kasir@streetcoffee.com'],
+            [
+                'name' => 'Kasir Ara', 
+                'password' => bcrypt('password'), 
+                'role' => 'kasir' // Jabatan Kasir
+            ]
+        );
+
+        // 2. DAFTAR BAHAN BAKU (LENGKAP DENGAN SAOS & TOPPING)
         $bahanList = [
             'Biji Kopi'     => ['stok' => 10000, 'satuan' => 'gram', 'min_stok' => 500],
             'Susu'          => ['stok' => 20000, 'satuan' => 'ml',   'min_stok' => 1000],
             'Bubuk Teh'     => ['stok' => 5000,  'satuan' => 'gram', 'min_stok' => 200],
             'Bubuk Matcha'  => ['stok' => 2000,  'satuan' => 'gram', 'min_stok' => 100],
             'Bubuk Cokelat' => ['stok' => 3000,  'satuan' => 'gram', 'min_stok' => 100],
-            'Saus Sambal'   => ['stok' => 1000,  'satuan' => 'gram', 'min_stok' => 100], // Baru
-            'Mayones'       => ['stok' => 1000,  'satuan' => 'gram', 'min_stok' => 100], // Baru
+            'Saus Sambal'   => ['stok' => 1000,  'satuan' => 'gram', 'min_stok' => 100],
+            'Mayones'       => ['stok' => 1000,  'satuan' => 'gram', 'min_stok' => 100],
             'Pisang'        => ['stok' => 100,   'satuan' => 'pcs',  'min_stok' => 10],
             'Sosis'         => ['stok' => 100,   'satuan' => 'pcs',  'min_stok' => 10],
             'Roti'          => ['stok' => 50,    'satuan' => 'pcs',  'min_stok' => 5],
-            'Cokelat Meses' => ['stok' => 2000,  'satuan' => 'gram', 'min_stok' => 100], // Baru
-            'Keju'          => ['stok' => 2000,  'satuan' => 'gram', 'min_stok' => 100], // Baru
+            'Cokelat Meses' => ['stok' => 2000,  'satuan' => 'gram', 'min_stok' => 100],
+            'Keju'          => ['stok' => 2000,  'satuan' => 'gram', 'min_stok' => 100],
             'Dimsum'        => ['stok' => 100,   'satuan' => 'pcs',  'min_stok' => 10],
             'Cup'           => ['stok' => 1000,  'satuan' => 'pcs',  'min_stok' => 50],
         ];
@@ -35,7 +52,7 @@ class StreetCoffeeSeeder extends Seeder {
             $createdBahan[$nama] = BahanBaku::updateOrCreate(['nama_bahan' => $nama], $data);
         }
 
-        // 2. Daftar Menu (Tetap 18 Menu)
+        // 3. DAFTAR MENU
         $list = [
             ['Espresso', 10000, 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400', 'Coffee'],
             ['Americano', 12000, 'https://mataseni.net/wp-content/uploads/2024/12/Mengenal-Caffe-Americano-Minuman-Kopi-Simpel-dengan-Rasa-yang-Kuat-1024x768.jpg', 'Coffee'],
@@ -60,7 +77,7 @@ class StreetCoffeeSeeder extends Seeder {
         foreach ($list as $item) {
             $m = Menu::updateOrCreate(['nama_menu' => $item[0]], ['harga' => $item[1], 'image_url' => $item[2], 'kategori' => $item[3]]);
 
-            // Tambahkan Cup & Resep (Termasuk Topping & Saus)
+            // Tambahkan Cup & Resep
             if ($item[3] != 'Snack') Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Cup']->id], ['jumlah_terpakai' => 1]);
 
             if ($item[0] == 'Toast Bread') {
