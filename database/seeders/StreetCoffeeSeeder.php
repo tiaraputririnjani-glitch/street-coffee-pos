@@ -70,24 +70,20 @@ class StreetCoffeeSeeder extends Seeder {
         foreach ($list as $item) {
             $m = Menu::updateOrCreate(['nama_menu' => $item[0]], ['harga' => $item[1], 'image_url' => $item[2], 'kategori' => $item[3]]);
 
-            // 1. SEMUA MINUMAN BUTUH CUP
             if ($item[3] != 'Snack') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Cup']->id], ['jumlah_terpakai' => 1]);
             }
 
-            // 2. RESEP KOPI (Biji Kopi 15gr)
             if ($item[3] == 'Coffee') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Biji Kopi']->id], ['jumlah_terpakai' => 15]);
             }
 
-            // 3. RESEP SUSU (150ml)
             if (str_contains($item[0], 'Latte') || str_contains($item[0], 'Susu') || 
                 str_contains($item[0], 'Cappuccino') || str_contains($item[0], 'Mocha') || 
                 str_contains($item[0], 'Macchiato')) {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Susu']->id], ['jumlah_terpakai' => 150]);
             }
 
-            // 5. RESEP BUBUK NON-COFFEE (LOGIKA BARU)
             if ($item[3] == 'Non-Coffee') {
                 if (str_contains($item[0], 'Taro')) {
                     Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Bubuk Taro']->id], ['jumlah_terpakai' => 20]);
@@ -102,7 +98,6 @@ class StreetCoffeeSeeder extends Seeder {
                 }
             }
 
-            // 4. RESEP MAKANAN
             if ($item[0] == 'Toast Bread') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Roti']->id], ['jumlah_terpakai' => 1]);
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Cokelat Meses']->id], ['jumlah_terpakai' => 10]);
@@ -110,12 +105,16 @@ class StreetCoffeeSeeder extends Seeder {
             } elseif ($item[0] == 'Sosis Bakar') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Sosis']->id], ['jumlah_terpakai' => 2]);
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Saus Sambal']->id], ['jumlah_terpakai' => 10]);
+                // --- BARIS MAYONES SUDAH DITAMBAHKAN DI BAWAH INI ---
+                Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Mayones']->id], ['jumlah_terpakai' => 5]);
             } elseif ($item[0] == 'Dimsum Ayam') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Dimsum']->id], ['jumlah_terpakai' => 4]);
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Saus Sambal']->id], ['jumlah_terpakai' => 5]);
             } elseif ($item[0] == 'French Fries') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Kentang']->id], ['jumlah_terpakai' => 150]);
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Saus Sambal']->id], ['jumlah_terpakai' => 5]);
+                // Kamu juga bisa tambah mayones di sini kalau kentangnya pakai saus mayo
+                Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Mayones']->id], ['jumlah_terpakai' => 5]);
             } elseif ($item[0] == 'Pisang Goreng') {
                 Recipe::updateOrCreate(['menu_id' => $m->id, 'bahan_id' => $createdBahan['Pisang']->id], ['jumlah_terpakai' => 3]);
             }
