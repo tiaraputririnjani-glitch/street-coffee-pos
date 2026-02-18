@@ -100,7 +100,8 @@
                                 <th class="pb-4 px-2">Waktu</th>
                                 <th class="pb-4 px-2">Customer</th>
                                 <th class="pb-4 px-2">Item</th>
-                                <th class="pb-4 px-2">Metode</th> <th class="pb-4 px-2 text-right">Total</th>
+                                <th class="pb-4 px-2">Metode</th> 
+                                <th class="pb-4 px-2 text-right">Total</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
@@ -128,7 +129,7 @@
             <div class="space-y-4 mb-4">
                 <div>
                     <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block tracking-widest">Customer Name</label>
-                    <input type="text" id="customer-name" placeholder="nama pelanggan..." class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm font-medium">
+                    <input type="text" id="customer-name" placeholder="Siapa namanya?..." class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm font-medium">
                 </div>
             </div>
 
@@ -143,14 +144,27 @@
                     <span class="text-xs font-black text-gray-400 uppercase tracking-tighter">Total Bayar</span>
                     <span id="cart-total" class="text-2xl font-black text-orange-600">Rp 0</span>
                 </div>
-                <div class="flex space-x-2">
-                    <select id="payment-method" class="flex-1 p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm appearance-none font-bold text-gray-700">
+                
+                <div class="flex flex-col space-y-3">
+                    <select id="payment-method" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold text-gray-700">
                         <option value="Cash">💵 Cash</option>
                         <option value="Dana">💙 Dana</option>
                         <option value="Gopay">💚 Gopay</option>
                         <option value="Kartu">💳 Kartu</option>
                     </select>
-                    <button id="btn-checkout" class="flex-[2] bg-orange-500 text-white py-3 rounded-xl font-black text-sm shadow-lg shadow-orange-100 hover:bg-orange-600 active:scale-95 transition-all disabled:bg-gray-100 disabled:text-gray-300" disabled>BAYAR SEKARANG</button>
+
+                    <div id="cash-calculator" class="p-4 bg-orange-50 rounded-2xl border border-orange-100 transition-all duration-300">
+                        <div class="mb-3">
+                            <label class="text-[10px] font-black text-orange-400 uppercase block mb-1">Uang Diterima (Rp)</label>
+                            <input type="number" id="cash-amount" placeholder="Input jumlah uang..." class="w-full p-2 bg-white border border-orange-200 rounded-lg outline-none text-sm font-bold text-gray-800 focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-black text-orange-400 uppercase">Kembalian</span>
+                            <span id="change-amount" class="text-sm font-black text-gray-800 tracking-tight">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <button id="btn-checkout" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-sm shadow-lg shadow-orange-100 hover:bg-orange-600 active:scale-95 transition-all disabled:bg-gray-100 disabled:text-gray-300 disabled:shadow-none" disabled>BAYAR SEKARANG</button>
                 </div>
             </div>
 
@@ -172,12 +186,18 @@
         <div id="modal-content" class="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
             <div class="bg-orange-500 p-8 text-white text-center">
                 <div class="text-4xl mb-2">☕</div>
-                <h2 class="text-2xl font-black uppercase">Street Coffee</h2>
+                <h2 class="text-2xl font-black uppercase tracking-tighter">Street Coffee</h2>
                 <p class="text-[10px] font-bold opacity-60 uppercase tracking-widest">Digital Receipt</p>
             </div>
             <div class="p-8 space-y-4 text-xs font-mono text-gray-600">
-                <div class="flex justify-between border-b border-dashed pb-2"><span>Customer:</span><span id="receipt-customer" class="font-black text-gray-900 text-right uppercase"></span></div>
+                <div class="flex justify-between border-b border-dashed pb-2"><span>Customer:</span><span id="receipt-customer" class="font-black text-gray-900 uppercase"></span></div>
                 <div class="flex justify-between border-b border-dashed pb-2"><span>Metode:</span><span id="receipt-method" class="font-black text-gray-900 uppercase"></span></div>
+                
+                <div id="receipt-cash-details" class="hidden">
+                    <div class="flex justify-between border-b border-dashed pb-2 text-gray-400"><span>Diterima:</span><span id="receipt-pay" class="font-bold"></span></div>
+                    <div class="flex justify-between border-b border-dashed pb-2 text-gray-400"><span>Kembalian:</span><span id="receipt-change" class="font-bold"></span></div>
+                </div>
+
                 <div id="receipt-items" class="py-2 space-y-2 max-h-40 overflow-y-auto pr-1"></div>
                 <div class="border-t-2 pt-4 flex justify-between text-lg font-black text-gray-900"><span>TOTAL</span><span id="receipt-total" class="text-orange-600"></span></div>
             </div>
@@ -187,6 +207,47 @@
 
     <script>
         let cart = [];
+
+        // DOM Elements
+        const paymentMethod = document.getElementById('payment-method');
+        const cashCalculator = document.getElementById('cash-calculator');
+        const cashInput = document.getElementById('cash-amount');
+        const changeDisplay = document.getElementById('change-amount');
+        const btnPay = document.getElementById('btn-checkout');
+
+        // Logic Show/Hide Calculator
+        paymentMethod.addEventListener('change', function() {
+            if(this.value === 'Cash') {
+                cashCalculator.style.display = 'block';
+            } else {
+                cashCalculator.style.display = 'none';
+                cashInput.value = '';
+                changeDisplay.innerText = "Rp 0";
+            }
+            updateCartUI(); // Re-validate button
+        });
+
+        // Logic Hitung Kembalian
+        cashInput.addEventListener('input', function() {
+            const total = parseInt(document.getElementById('cart-total').innerText.replace(/[^0-9]/g,'')) || 0;
+            const bayar = parseInt(this.value) || 0;
+            const kembalian = bayar - total;
+
+            if (bayar > 0) {
+                if(kembalian >= 0) {
+                    changeDisplay.innerText = "Rp " + kembalian.toLocaleString();
+                    changeDisplay.classList.remove('text-red-500');
+                    btnPay.disabled = false;
+                } else {
+                    changeDisplay.innerText = "Uang Kurang!";
+                    changeDisplay.classList.add('text-red-500');
+                    btnPay.disabled = true;
+                }
+            } else {
+                changeDisplay.innerText = "Rp 0";
+                btnPay.disabled = true;
+            }
+        });
 
         document.querySelectorAll('.add-to-cart').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -202,11 +263,12 @@
         function updateCartUI() {
             const container = document.getElementById('cart-container');
             const totalDisplay = document.getElementById('cart-total');
-            const btnPay = document.getElementById('btn-checkout');
 
             if(cart.length === 0) {
                 container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-300 italic text-sm py-10"><p>Keranjang Kosong...</p></div>`;
-                totalDisplay.innerText = "Rp 0"; btnPay.disabled = true; return;
+                totalDisplay.innerText = "Rp 0"; 
+                btnPay.disabled = true;
+                return;
             }
 
             let html = ''; let total = 0;
@@ -227,7 +289,14 @@
 
             container.innerHTML = html;
             totalDisplay.innerText = "Rp " + total.toLocaleString();
-            btnPay.disabled = false;
+
+            // Validasi Tombol Bayar
+            if (paymentMethod.value === 'Cash') {
+                const bayar = parseInt(cashInput.value) || 0;
+                btnPay.disabled = (bayar < total);
+            } else {
+                btnPay.disabled = false;
+            }
         }
 
         function removeItem(i) { cart.splice(i, 1); updateCartUI(); }
@@ -245,7 +314,7 @@
 
         document.getElementById('btn-checkout').addEventListener('click', function() {
             const name = document.getElementById('customer-name').value;
-            const method = document.getElementById('payment-method').value;
+            const method = paymentMethod.value;
             const totalVal = parseInt(document.getElementById('cart-total').innerText.replace(/[^0-9]/g,''));
             
             if(!name) return alert('⚠️ Tulis nama pelanggan dulu ya!');
@@ -261,9 +330,18 @@
             .then(data => {
                 if(data.success) {
                     document.getElementById('receipt-customer').innerText = name;
-                    document.getElementById('receipt-method').innerText = method; // Update Metode di Nota
-                    document.getElementById('receipt-total').innerText = document.getElementById('cart-total').innerText;
+                    document.getElementById('receipt-method').innerText = method;
+                    document.getElementById('receipt-total').innerText = "Rp " + totalVal.toLocaleString();
                     
+                    // Show/Hide Cash Details in Receipt
+                    if(method === 'Cash') {
+                        document.getElementById('receipt-cash-details').classList.remove('hidden');
+                        document.getElementById('receipt-pay').innerText = "Rp " + parseInt(cashInput.value).toLocaleString();
+                        document.getElementById('receipt-change').innerText = changeDisplay.innerText;
+                    } else {
+                        document.getElementById('receipt-cash-details').classList.add('hidden');
+                    }
+
                     let itemsHtml = '';
                     cart.forEach(i => itemsHtml += `<div class="flex justify-between"><span>${i.name} x${i.qty}</span><span>Rp ${(i.price*i.qty).toLocaleString()}</span></div>`);
                     document.getElementById('receipt-items').innerHTML = itemsHtml;
