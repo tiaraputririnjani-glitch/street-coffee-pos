@@ -44,7 +44,7 @@
         <div class="bg-white w-full max-w-sm rounded-[3rem] p-10 text-center shadow-2xl">
             <div class="text-4xl mb-4">🌙</div>
             <h2 class="text-xl font-black text-gray-800 uppercase mb-2 tracking-tighter">Tutup Kasir</h2>
-            <p class="text-xs text-gray-400 font-bold mb-8 italic">Hitung uang fisik di laci saat ini</p>
+            <p class="text-xs text-gray-400 font-bold mb-8 italic text-red-500 font-black">Hitung uang fisik di laci saat ini!</p>
             <div class="mb-8 relative">
                 <span class="absolute left-4 top-4 font-black text-orange-300">Rp</span>
                 <input type="number" id="closing-cash" placeholder="0" class="w-full p-4 pl-12 bg-gray-50 border border-gray-100 rounded-2xl outline-none text-center text-xl font-black text-orange-600 focus:ring-4 focus:ring-orange-100">
@@ -63,8 +63,7 @@
             <button class="filter-btn p-2 md:p-3 text-gray-400 hover:text-orange-600 rounded-xl text-sm flex-shrink-0" data-target="Snack">Snack</button>
             
             <div class="md:mt-auto flex flex-row md:flex-col items-center space-x-4 md:space-x-0 md:space-y-4">
-                <button onclick="openCloseShiftModal()" class="p-2 md:p-3 text-gray-400 hover:text-red-500 transition-colors text-xl" title="Tutup Shift Sekarang">🔒</button>
-                
+                <button onclick="openCloseShiftModal()" class="p-2 md:p-3 text-gray-400 hover:text-red-500 transition-colors text-xl" title="Tutup Shift">🔒</button>
                 <button id="open-inventory" class="relative p-2 md:p-3 text-gray-400 hover:text-orange-500 transition-colors text-xl" title="Cek Stok Gudang">
                     📦
                     @php $lowStockCount = $stokBahan->where('stok', '<=', 'min_stok')->count(); @endphp
@@ -72,7 +71,6 @@
                         <span class="absolute top-1 right-1 bg-red-500 text-white text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-full animate-bounce">{{ $lowStockCount }}</span>
                     @endif
                 </button>
-
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="p-2 md:p-3 text-gray-300 hover:text-red-500 transition-colors"><span class="text-xl">🚪</span></button>
@@ -88,7 +86,7 @@
                     <span class="mr-3 text-xl">🛒</span>
                     <p class="text-xs font-black text-red-700 uppercase tracking-tighter">Ada {{ $lowStockCount }} bahan yang hampir habis! Owner segera isi stok lgi.</p>
                 </div>
-                <button onclick="document.getElementById('open-inventory').click()" class="text-[9px] font-black text-red-500 underline uppercase">Update Stok</button>
+                <button onclick="document.getElementById('open-inventory').click()" class="text-[9px] font-black text-red-500 underline uppercase">Lihat Bahan</button>
             </div>
             @endif
 
@@ -100,19 +98,6 @@
             @endif
 
             <div id="section-pos" class="space-y-8">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h1 class="text-xl md:text-2xl font-black text-gray-800 tracking-tight uppercase">Street Coffee</h1>
-                        <p class="text-gray-400 text-xs font-bold italic">Halo {{ Auth::user()->name }}, semangat melayani! ✨</p>
-                    </div>
-                    @if(Auth::user()->role == 'admin')
-                    <div class="bg-orange-500 p-3 md:p-4 rounded-2xl shadow-lg text-white text-right">
-                        <span class="text-[9px] uppercase font-black opacity-70 block tracking-wider">Omzet Hari Ini</span>
-                        <span class="text-lg font-black">Rp {{ number_format($pendapatan) }}</span>
-                    </div>
-                    @endif
-                </div>
-
                 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                     @foreach($menus as $menu)
                     <div class="menu-item bg-white rounded-[2rem] shadow-sm hover:shadow-xl transition-all p-3 md:p-4 group border border-transparent hover:border-orange-100" data-category="{{ $menu->kategori }}">
@@ -128,6 +113,34 @@
                     </div>
                     @endforeach
                 </div>
+
+                <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100">
+                    <h2 class="text-lg font-black text-gray-800 mb-6 uppercase tracking-tighter">📋 Transaksi Terakhir (Hari Ini)</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left min-w-[500px]">
+                            <thead>
+                                <tr class="text-gray-400 text-[10px] uppercase font-black border-b border-gray-50">
+                                    <th class="pb-4 px-2">Waktu</th>
+                                    <th class="pb-4 px-2">Customer</th>
+                                    <th class="pb-4 px-2">Pesanan</th>
+                                    <th class="pb-4 px-2">Metode</th>
+                                    <th class="pb-4 px-2 text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                @foreach($riwayat as $trx)
+                                <tr class="text-xs group hover:bg-orange-50 transition-colors">
+                                    <td class="py-4 text-gray-400 px-2">{{ $trx->created_at->format('H:i') }}</td>
+                                    <td class="py-4 font-bold text-gray-800 px-2 uppercase">{{ $trx->nama_customer }}</td>
+                                    <td class="py-4 text-gray-500 italic px-2">{{ $trx->item_list }}</td>
+                                    <td class="py-4 px-2"><span class="bg-gray-100 px-2 py-1 rounded text-[10px] font-black uppercase text-gray-500 italic">{{ $trx->metode_pembayaran }}</span></td>
+                                    <td class="py-4 text-right font-black text-orange-600 px-2">Rp {{ number_format($trx->total_harga) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <div id="section-rekap" class="hidden space-y-6">
@@ -136,13 +149,13 @@
                     <div class="flex flex-wrap gap-4 items-end">
                         <div class="flex-1 min-w-[200px]">
                             <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block tracking-widest">Dari Tanggal</label>
-                            <input type="date" id="date-start" class="w-full p-3 bg-gray-50 border rounded-xl outline-none text-sm font-bold">
+                            <input type="date" id="date-start" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold">
                         </div>
                         <div class="flex-1 min-w-[200px]">
                             <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block tracking-widest">Hingga Tanggal</label>
-                            <input type="date" id="date-end" class="w-full p-3 bg-gray-50 border rounded-xl outline-none text-sm font-bold">
+                            <input type="date" id="date-end" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold">
                         </div>
-                        <button onclick="filterReport()" class="bg-gray-900 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition-all">Lihat Laporan</button>
+                        <button onclick="filterReport()" class="bg-gray-900 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg">Lihat Laporan</button>
                     </div>
                 </div>
 
@@ -161,13 +174,36 @@
                     </div>
                 </div>
 
+                <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100 overflow-hidden">
+                    <h3 class="font-black uppercase text-gray-800 mb-6 flex justify-between">
+                        <span>Rincian Pembelian Periode</span>
+                        <span class="text-[10px] text-gray-300 italic">*pilih tanggal di atas</span>
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left min-w-[600px]">
+                            <thead>
+                                <tr class="text-gray-400 text-[10px] uppercase font-black border-b">
+                                    <th class="pb-4">Tanggal</th>
+                                    <th class="pb-4">Customer</th>
+                                    <th class="pb-4">Item Pembelian</th>
+                                    <th class="pb-4">Metode</th>
+                                    <th class="pb-4 text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-table-body" class="divide-y divide-gray-50 text-xs">
+                                <tr><td colspan="5" class="py-10 text-center text-gray-300 italic font-black uppercase">Belum ada data, silakan pilih tanggal</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div id="audit-result" class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="font-black uppercase text-gray-800">Hasil Audit Terakhir</h3>
                         <button onclick="localStorage.removeItem('shift_active'); window.location.reload();" class="text-[9px] font-black text-red-400 uppercase border border-red-100 px-3 py-1 rounded-lg">⚠️ Reset Shift Kasir</button>
                     </div>
                     <div id="audit-content">
-                        <p class="text-center text-xs text-gray-400 italic">Data audit akan muncul setelah kasir menutup shift.</p>
+                        <p class="text-center text-xs text-gray-400 italic font-black uppercase">Shift belum ditutup.</p>
                     </div>
                 </div>
             </div>
@@ -185,7 +221,7 @@
 
             <div class="border-t border-gray-50 pt-4 space-y-4">
                 <div class="flex justify-between items-center">
-                    <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Total Bayar</span>
+                    <span class="text-xs font-black text-gray-400 uppercase">Total Bayar</span>
                     <span id="cart-total" class="text-2xl font-black text-orange-600 tracking-tighter">Rp 0</span>
                 </div>
                 <div class="flex flex-col space-y-3">
@@ -228,7 +264,7 @@
                     @foreach($stokBahan as $bahan)
                     <div class="inventory-item p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-orange-100 transition-all" data-name="{{ strtolower($bahan->nama_bahan) }}">
                         <div class="flex justify-between items-center mb-3">
-                            <span class="text-xs font-black text-gray-600 uppercase">{{ $bahan->nama_bahan }}</span>
+                            <span class="text-xs font-black text-gray-700 uppercase">{{ $bahan->nama_bahan }}</span>
                             <span class="text-xs font-black {{ $bahan->stok <= $bahan->min_stok ? 'text-red-500 animate-pulse' : 'text-green-600' }}">{{ number_format($bahan->stok) }} {{ $bahan->satuan }}</span>
                         </div>
                         @if(Auth::user()->role == 'admin')
@@ -256,13 +292,13 @@
                 <div class="flex justify-between border-b border-dashed pb-2"><span>Customer:</span><span id="receipt-customer" class="font-black text-gray-900 uppercase"></span></div>
                 <div class="flex justify-between border-b border-dashed pb-2"><span>Metode:</span><span id="receipt-method" class="font-black text-gray-900 uppercase"></span></div>
                 <div id="receipt-cash-details" class="hidden">
-                    <div class="flex justify-between border-b border-dashed pb-2 text-gray-400"><span>Uang Bayar:</span><span id="receipt-pay" class="font-bold"></span></div>
+                    <div class="flex justify-between border-b border-dashed pb-2 text-gray-400"><span>Bayar:</span><span id="receipt-pay" class="font-bold"></span></div>
                     <div class="flex justify-between border-b border-dashed pb-2 text-gray-400"><span>Kembalian:</span><span id="receipt-change" class="font-bold text-orange-600"></span></div>
                 </div>
                 <div id="receipt-items" class="py-2 space-y-2 max-h-40 overflow-y-auto pr-1"></div>
-                <div class="border-t-4 pt-6 flex justify-between text-lg font-black text-gray-900 uppercase"><span>TOTAL</span><span id="receipt-total" class="text-orange-600"></span></div>
+                <div class="border-t-4 pt-6 flex justify-between text-lg font-black text-gray-900 uppercase tracking-tighter"><span>TOTAL</span><span id="receipt-total" class="text-orange-600"></span></div>
             </div>
-            <div class="p-8 pt-0"><button onclick="window.location.reload()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black hover:bg-black transition-all uppercase tracking-widest shadow-xl">Selesai</button></div>
+            <div class="p-8 pt-0"><button onclick="window.location.reload()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black hover:bg-black transition-all shadow-xl uppercase">Selesai</button></div>
         </div>
     </div>
 
@@ -299,23 +335,22 @@
             let resultHtml = `
                 <div class="text-left space-y-2 p-6 bg-gray-50 rounded-3xl border-2 ${difference < 0 ? 'border-red-100' : 'border-green-100'}">
                     <h3 class="font-black uppercase text-[10px] mb-4 text-gray-400">Rincian Audit Shift Hari Ini</h3>
-                    <div class="flex justify-between text-xs"><span>Kas Awal (Modal):</span><span class="font-bold">Rp ${opening.toLocaleString()}</span></div>
+                    <div class="flex justify-between text-xs"><span>Kas Awal:</span><span class="font-bold">Rp ${opening.toLocaleString()}</span></div>
                     <div class="flex justify-between text-xs"><span>Omzet Tunai:</span><span class="font-bold">Rp ${sales.toLocaleString()}</span></div>
                     <hr class="border-dashed">
-                    <div class="flex justify-between text-xs"><span>Saldo Seharusnya:</span><span class="font-bold text-orange-600">Rp ${expected.toLocaleString()}</span></div>
-                    <div class="flex justify-between text-xs"><span>Saldo di Laci:</span><span class="font-bold text-blue-600">Rp ${closing.toLocaleString()}</span></div>
+                    <div class="flex justify-between text-xs font-black text-orange-600"><span>Seharusnya:</span><span>Rp ${expected.toLocaleString()}</span></div>
+                    <div class="flex justify-between text-xs font-black text-blue-600"><span>Uang Fisik:</span><span>Rp ${closing.toLocaleString()}</span></div>
                     <hr class="border-dashed">
                     <div class="flex justify-between ${difference < 0 ? 'text-red-500' : 'text-green-600'} font-black uppercase text-sm">
-                        <span>Status Laporan:</span><span>${difference < 0 ? 'MINUS Rp ' + Math.abs(difference).toLocaleString() : 'COCOK/AMAN ✨'}</span>
+                        <span>Status:</span><span>${difference < 0 ? 'MINUS Rp ' + Math.abs(difference).toLocaleString() : 'COCOK ✨'}</span>
                     </div>
-                </div>
-            `;
+                </div>`;
             localStorage.setItem('last_audit_html', resultHtml);
             localStorage.removeItem('shift_active');
             window.location.reload();
         }
 
-        // 2. TAB SWITCHING & REPORTS
+        // 2. TAB SWITCHING
         function switchTab(target) {
             const pos = document.getElementById('section-pos');
             const rekap = document.getElementById('section-rekap');
@@ -335,24 +370,49 @@
             }
         }
 
+        // 3. FITUR LAPORAN DETAIL (BARU!)
         function filterReport() {
             const start = document.getElementById('date-start').value;
             const end = document.getElementById('date-end').value;
-            if(!start || !end) return alert('Pilih rentang tanggal!');
+            if(!start || !end) return alert('Pilih rentang tanggal dulu!');
+
             fetch(`/get-report?start_date=${start}&end_date=${end}`)
                 .then(r => r.json())
                 .then(data => {
+                    // Update Summary Cards
                     document.getElementById('rekap-total-display').innerText = "Rp " + data.total_omzet.toLocaleString();
                     document.getElementById('rekap-cash-display').innerText = "Rp " + data.saldo_cash.toLocaleString();
                     document.getElementById('rekap-digital-display').innerText = "Rp " + data.saldo_digital.toLocaleString();
+
+                    // Update Table Detail (Riwayat Pembelian)
+                    const tbody = document.getElementById('report-table-body');
+                    if(data.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="py-10 text-center text-gray-300 italic font-black uppercase">Yah, tidak ada transaksi di periode ini.</td></tr>';
+                        return;
+                    }
+
+                    let rows = '';
+                    data.data.forEach(trx => {
+                        const date = new Date(trx.created_at).toLocaleDateString('id-ID', {day:'2-digit', month:'2-digit', year:'2-digit'});
+                        rows += `
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-4 text-gray-400 font-bold">${date}</td>
+                                <td class="py-4 font-black uppercase">${trx.nama_customer}</td>
+                                <td class="py-4 text-gray-500 italic">${trx.item_list}</td>
+                                <td class="py-4 font-black text-blue-500 uppercase">${trx.metode_pembayaran}</td>
+                                <td class="py-4 text-right font-black text-orange-600">Rp ${parseInt(trx.total_harga).toLocaleString()}</td>
+                            </tr>
+                        `;
+                    });
+                    tbody.innerHTML = rows;
                 });
         }
 
-        // 3. LOGIKA RESTOCK (ADMIN ONLY)
+        // 4. RESTOCK
         function restockItem(bahanId) {
             const qtyInput = document.getElementById('restock-qty-' + bahanId);
             const jumlah = qtyInput.value;
-            if(!jumlah || jumlah < 1) return alert('Input jumlah stok baru!');
+            if(!jumlah || jumlah < 1) return alert('Input jumlah stok!');
             fetch("{{ route('restock') }}", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" },
@@ -362,7 +422,7 @@
             .then(data => { if(data.success) { alert(data.message); window.location.reload(); } });
         }
 
-        // 4. KASIR LOGIC (ADD TO CART, CHECKOUT)
+        // 5. KASIR LOGIC
         const paymentMethod = document.getElementById('payment-method');
         const cashInput = document.getElementById('cash-amount');
         const changeDisplay = document.getElementById('change-amount');
@@ -378,7 +438,7 @@
             const bayar = parseInt(this.value) || 0;
             const kembalian = bayar - total;
             changeDisplay.innerText = "Rp " + (kembalian >= 0 ? kembalian.toLocaleString() : "0");
-            btnPay.disabled = (this.value === '' || (this.value !== '' && kembalian < 0));
+            btnPay.disabled = (kembalian < 0);
         });
 
         document.querySelectorAll('.add-to-cart').forEach(btn => {
@@ -396,7 +456,7 @@
             const container = document.getElementById('cart-container');
             const totalDisplay = document.getElementById('cart-total');
             if(cart.length === 0) {
-                container.innerHTML = `<div class="flex flex-col items-center justify-center text-gray-300 italic py-10"><p>Pesanan kosong...</p></div>`;
+                container.innerHTML = `<div class="flex flex-col items-center justify-center text-gray-300 py-10"><p>Belum ada pesanan...</p></div>`;
                 totalDisplay.innerText = "Rp 0"; btnPay.disabled = true; return;
             }
             let html = ''; let total = 0;
@@ -442,7 +502,7 @@
                         document.getElementById('receipt-change').innerText = changeDisplay.innerText;
                     }
                     let itemsHtml = '';
-                    cart.forEach(i => itemsHtml += `<div class="flex justify-between"><span>${i.name} x${i.qty}</span><span class="font-bold text-gray-900">Rp ${(i.price*i.qty).toLocaleString()}</span></div>`);
+                    cart.forEach(i => itemsHtml += `<div class="flex justify-between"><span>${i.name} x${i.qty}</span><span class="font-bold">Rp ${(i.price*i.qty).toLocaleString()}</span></div>`);
                     document.getElementById('receipt-items').innerHTML = itemsHtml;
                     document.getElementById('receipt-modal').classList.remove('hidden');
                     setTimeout(() => document.getElementById('modal-content').classList.replace('opacity-0','opacity-100'), 50);
@@ -450,16 +510,13 @@
             });
         });
 
-        // GUDANG MODAL
-        const invModal = document.getElementById('inventory-modal');
-        document.getElementById('open-inventory').addEventListener('click', () => invModal.classList.remove('hidden'));
-        document.getElementById('close-inventory').addEventListener('click', () => invModal.classList.add('hidden'));
-        document.getElementById('btn-close-inv').addEventListener('click', () => invModal.classList.add('hidden'));
+        // GUDANG SEARCH
+        document.getElementById('open-inventory').addEventListener('click', () => document.getElementById('inventory-modal').classList.remove('hidden'));
+        document.getElementById('close-inventory').addEventListener('click', () => document.getElementById('inventory-modal').classList.add('hidden'));
+        document.getElementById('btn-close-inv').addEventListener('click', () => document.getElementById('inventory-modal').classList.add('hidden'));
         document.getElementById('search-inventory').addEventListener('input', function() {
             const query = this.value.toLowerCase();
-            document.querySelectorAll('.inventory-item').forEach(item => {
-                item.style.display = item.getAttribute('data-name').includes(query) ? 'flex' : 'none';
-            });
+            document.querySelectorAll('.inventory-item').forEach(item => { item.style.display = item.getAttribute('data-name').includes(query) ? 'block' : 'none'; });
         });
 
         document.querySelectorAll('.filter-btn').forEach(btn => {
