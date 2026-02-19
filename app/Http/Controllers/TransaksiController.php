@@ -83,18 +83,23 @@ class TransaksiController extends Controller
      * FITUR LAPORAN (Baru & Sudah Diperbaiki)
      */
     public function getReport(Request $request) 
-    {
-        // Pastikan format tanggal benar
-        $start = $request->start_date . " 00:00:00";
-        $end = $request->end_date . " 23:59:59";
+{
+    $start = $request->start_date . " 00:00:00";
+    $end = $request->end_date . " 23:59:59";
 
-        // Cari transaksi di antara tanggal yang dipilih
-        $transaksi = Transaksi::whereBetween('created_at', [$start, $end])->get();
+    $transaksi = Transaksi::whereBetween('created_at', [$start, $end])->get();
 
-        return response()->json([
-            'total_omzet' => $transaksi->sum('total_harga'),
-            'total_order' => $transaksi->count(),
-            'data' => $transaksi
-        ]);
+    // Hitung saldo per metode pembayaran
+    $saldo_cash = Transaksi::whereBetween('created_at', [$start, $end])->where('metode_pembayaran', 'Cash')->sum('total_harga');
+    $saldo_digital = Transaksi::whereBetween('created_at', [$start, $end])->where('metode_pembayaran', '!=', 'Cash')->sum('total_harga');
+
+    return response()->json([
+        'total_omzet' => $transaksi->sum('total_harga'),
+        'saldo_cash' => $saldo_cash,
+        'saldo_digital' => $saldo_digital,
+        'total_order' => $transaksi->count(),
+        'data' => $transaksi
+    ]);
+
     }
 }
