@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Street Coffee POS - Professional Edition</title>
+    <title>Street Coffee POS - Final Fix Perfection</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -23,15 +23,15 @@
 </head>
 <body class="bg-gray-100 font-sans text-gray-900">
 
-    <div id="shift-modal" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-[300] p-4 backdrop-blur-2xl no-print">
+    <div id="shift-modal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-[500] p-4 backdrop-blur-2xl no-print">
         <div class="bg-white w-full max-w-sm rounded-[3rem] p-10 text-center shadow-2xl border-4 border-orange-500">
             <div class="text-6xl mb-4">☕</div>
             <h2 class="text-2xl font-black text-gray-800 uppercase mb-2 tracking-tighter">Buka Shift Kasir</h2>
-            <p class="text-[10px] text-gray-400 font-bold mb-10 italic uppercase tracking-widest">Identitas Resmi Sebelum Operasional</p>
+            <p class="text-[10px] text-gray-400 font-bold mb-10 italic uppercase tracking-widest">Identitas Wajib Sebelum Operasional</p>
             <div class="space-y-5 mb-10">
                 <div class="text-left">
                     <label class="text-[10px] font-black text-gray-400 uppercase ml-2 mb-1 block">Nama Kasir Bertugas</label>
-                    <input type="text" id="cashier-name-input" placeholder="Masukkan Nama Anda..." class="w-full p-5 bg-gray-50 border border-gray-100 rounded-3xl outline-none text-center font-black text-gray-700 focus:ring-4 focus:ring-orange-200 text-lg">
+                    <input type="text" id="cashier-name-input" placeholder="Masukkan Nama..." class="w-full p-5 bg-gray-50 border border-gray-100 rounded-3xl outline-none text-center font-black text-gray-700 focus:ring-4 focus:ring-orange-200 text-lg">
                 </div>
                 <div class="text-left">
                     <label class="text-[10px] font-black text-gray-400 uppercase ml-2 mb-1 block">Modal Awal Laci (Rp)</label>
@@ -66,7 +66,7 @@
             <button class="filter-btn p-2 md:p-3 text-gray-400 hover:text-orange-600 rounded-xl text-sm flex-shrink-0 font-bold" data-target="Snack">Snack</button>
             
             <div class="md:mt-auto flex flex-row md:flex-col items-center space-x-4 md:space-x-0 md:space-y-4">
-                <button onclick="openCloseShiftModal()" class="p-2 md:p-3 text-gray-400 hover:text-red-500 transition-colors text-xl" title="Tutup Shift Sekarang">🔒</button>
+                <button onclick="openCloseShiftModal()" class="p-2 md:p-3 text-gray-400 hover:text-red-500 transition-colors text-xl" title="Tutup Shift">🔒</button>
                 <button id="open-inventory" class="relative p-2 md:p-3 text-gray-400 hover:text-orange-500 transition-colors text-xl">
                     📦
                     @php $lowStockCount = $stokBahan->where('stok', '<=', 'min_stok')->count(); @endphp
@@ -104,7 +104,7 @@
                         <h3 class="font-bold text-gray-800 mb-1 text-sm truncate uppercase tracking-tighter">{{ $menu->nama_menu }}</h3>
                         <div class="flex justify-between items-center">
                             <span class="text-orange-600 font-black text-sm">Rp {{ number_format($menu->harga) }}</span>
-                            <button class="add-to-cart bg-gray-900 text-white w-8 h-8 rounded-xl hover:bg-orange-600 active:scale-90 transition-all shadow-md flex items-center justify-center font-bold"
+                            <button class="add-to-cart bg-gray-900 text-white w-8 h-8 rounded-xl hover:bg-orange-600 shadow-md flex items-center justify-center font-bold"
                                 data-id="{{ $menu->id }}" data-name="{{ $menu->nama_menu }}" data-price="{{ $menu->harga }}">+</button>
                         </div>
                     </div>
@@ -120,8 +120,8 @@
                                     <th class="pb-4 px-2">Waktu</th>
                                     <th class="pb-4 px-2">Nama Pelanggan</th>
                                     <th class="pb-4 px-2">Detail Item</th>
-                                    <th class="pb-4 px-2">Metode Pembayaran</th>
-                                    <th class="pb-4 px-2 text-right">Jumlah (IDR)</th>
+                                    <th class="pb-4 px-2">Pembayaran</th>
+                                    <th class="pb-4 px-2 text-right">Total</th>
                                     <th class="pb-4 text-center">Void</th>
                                 </tr>
                             </thead>
@@ -131,7 +131,7 @@
                                     <td class="py-5 text-gray-400 px-2 font-bold">{{ $trx->created_at->format('H:i') }}</td>
                                     <td class="py-5 font-black uppercase px-2 text-gray-800">{{ $trx->nama_customer }}</td>
                                     <td class="py-5 text-gray-500 italic px-2 leading-relaxed">{{ $trx->item_list }}</td>
-                                    <td class="py-5 px-2 text-[10px] font-black uppercase"><span class="bg-blue-50 text-blue-600 px-2 py-1 rounded">{{ $trx->metode_pembayaran }}</span></td>
+                                    <td class="py-5 px-2 font-black text-blue-500 uppercase italic text-[10px]">{{ $trx->metode_pembayaran }}</td>
                                     <td class="py-5 text-right font-black text-orange-600 px-2">Rp {{ number_format($trx->total_harga) }}</td>
                                     <td class="py-5 text-center">
                                         @if(Auth::user()->role == 'admin')
@@ -148,35 +148,35 @@
 
             <div id="section-rekap" class="hidden space-y-6 print-area">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm"><p class="text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Saldo Tunai (Laci)</p><p id="rekap-cash-display" class="text-2xl font-black text-green-600 tracking-tighter">Rp 0</p></div>
-                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm"><p class="text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Saldo Digital (Bank)</p><p id="rekap-digital-display" class="text-2xl font-black text-blue-600 tracking-tighter">Rp 0</p></div>
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm"><p class="text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Saldo Tunai</p><p id="rekap-cash-display" class="text-2xl font-black text-green-600 tracking-tighter">Rp 0</p></div>
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm"><p class="text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Saldo Digital</p><p id="rekap-digital-display" class="text-2xl font-black text-blue-600 tracking-tighter">Rp 0</p></div>
                     <div class="bg-orange-500 p-8 rounded-[2.5rem] shadow-lg text-white"><p class="text-[10px] font-black uppercase mb-2 opacity-70">Total Omzet</p><p id="rekap-total-display" class="text-3xl font-black tracking-tighter">Rp 0</p></div>
                 </div>
                 <div id="audit-result-area" class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="font-black uppercase text-gray-800 underline italic">Hasil Audit Shift Terakhir</h3>
-                        <button onclick="localStorage.removeItem('shift_active'); window.location.reload();" class="text-[9px] font-black text-red-400 uppercase border border-red-50 px-3 py-1 rounded-lg no-print">⚠️ Reset Shift</button>
+                        <button onclick="resetShiftManual()" class="text-[9px] font-black text-red-400 uppercase border border-red-50 px-3 py-1 rounded-lg no-print">⚠️ Reset Shift</button>
                     </div>
-                    <div id="audit-content"><p class="text-center text-xs text-gray-400 font-bold uppercase py-10">Belum ada shift ditutup.</p></div>
+                    <div id="audit-content"><p class="text-center text-xs text-gray-400 font-black uppercase py-10">Belum ada shift ditutup (🔒)</p></div>
                 </div>
             </div>
         </div>
 
         <div class="w-full md:w-96 bg-white p-6 shadow-2xl flex flex-col border-l border-gray-100 h-full overflow-y-auto z-20 no-scrollbar no-print">
-            <h2 class="text-xl font-black text-gray-800 mb-6 uppercase tracking-tighter">🛒 Detail Pesanan</h2>
-            <div class="space-y-4 mb-4"><input type="text" id="customer-name" placeholder="Nama Pelanggan..." class="w-full p-4 bg-gray-50 border rounded-2xl outline-none text-sm font-bold focus:ring-2 focus:ring-orange-500"></div>
-            <div id="cart-container" class="space-y-3 mb-6 flex-1"><p class="py-10 text-center font-black opacity-20 uppercase text-[10px] tracking-widest italic">Belum ada menu dipilih</p></div>
+            <h2 class="text-xl font-black text-gray-800 mb-6 uppercase tracking-tighter">🛒 Keranjang</h2>
+            <div class="space-y-4 mb-4"><input type="text" id="customer-name" placeholder="Nama Pelanggan..." class="w-full p-4 bg-gray-50 border rounded-xl outline-none text-sm font-bold focus:ring-2 focus:ring-orange-500"></div>
+            <div id="cart-container" class="space-y-3 mb-6 flex-1"><p class="py-10 text-center font-black opacity-20 uppercase text-[10px]">Keranjang Kosong</p></div>
             <div class="border-t border-gray-50 pt-4 space-y-4">
-                <div class="flex justify-between items-center"><span class="text-xs font-black text-gray-400 uppercase tracking-widest">Total Tagihan</span><span id="cart-total" class="text-2xl font-black text-orange-600 tracking-tighter">Rp 0</span></div>
+                <div class="flex justify-between items-center"><span class="text-xs font-black text-gray-400 uppercase">Total Bayar</span><span id="cart-total" class="text-2xl font-black text-orange-600 tracking-tighter">Rp 0</span></div>
                 <div class="flex flex-col space-y-3">
-                    <select id="payment-method" class="w-full p-4 bg-gray-50 border rounded-2xl outline-none text-sm font-bold text-gray-700 shadow-sm appearance-none">
+                    <select id="payment-method" class="w-full p-3 bg-gray-50 border rounded-xl outline-none text-sm font-bold text-gray-700 shadow-sm appearance-none">
                         <option value="Cash">💵 Cash / Tunai</option><option value="Dana">💙 Dana</option><option value="Gopay">💚 Gopay</option><option value="Kartu">💳 Kartu Debit/Kredit</option>
                     </select>
                     <div id="cash-calculator" class="p-4 bg-orange-50 rounded-2xl border border-orange-100">
-                        <div class="mb-3 text-center"><label class="text-[10px] font-black text-orange-400 uppercase block mb-1">Nominal Tunai Diterima</label><input type="number" id="cash-amount" placeholder="0" class="w-full p-3 bg-white border rounded-xl outline-none text-lg font-black text-gray-800 text-center"></div>
+                        <div class="mb-3 text-center"><label class="text-[10px] font-black text-orange-400 uppercase block mb-1">Uang Diterima</label><input type="number" id="cash-amount" placeholder="0" class="w-full p-2 bg-white border rounded-lg outline-none text-sm font-bold text-gray-800 text-center"></div>
                         <div class="flex justify-between items-center"><span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Kembalian</span><span id="change-amount" class="text-sm font-black text-orange-600">Rp 0</span></div>
                     </div>
-                    <button id="btn-checkout" onclick="performCheckout()" class="w-full bg-orange-500 text-white py-5 rounded-3xl font-black text-sm shadow-xl hover:bg-orange-600 active:scale-95 disabled:opacity-30 transition-all uppercase tracking-widest" disabled>KONFIRMASI PEMBAYARAN</button>
+                    <button id="btn-checkout" onclick="performCheckout()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-sm shadow-lg hover:bg-orange-600 active:scale-95 transition-all disabled:opacity-30 disabled:bg-gray-200" disabled>BAYAR SEKARANG</button>
                 </div>
             </div>
         </div>
@@ -185,54 +185,60 @@
     <div id="inventory-modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-[250] p-4 backdrop-blur-sm no-print">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-cart-item-enter">
             <div class="bg-orange-500 p-6 text-white flex justify-between items-center">
-                <h2 class="text-xl font-black uppercase tracking-tight">📦 Inventaris Gudang</h2>
-                <button onclick="document.getElementById('inventory-modal').classList.replace('flex','hidden')" class="text-4xl font-bold hover:text-black">&times;</button>
+                <h2 class="text-xl font-black uppercase tracking-tight">📦 Gudang</h2>
+                <button onclick="document.getElementById('inventory-modal').classList.replace('flex','hidden')" class="text-3xl font-bold hover:text-black">&times;</button>
             </div>
             <div class="p-6">
                 <div class="relative mb-6">
-                    <input type="text" id="search-inventory" placeholder="Cari bahan kopi..." class="w-full p-4 pl-12 bg-gray-50 border border-gray-100 rounded-2xl outline-none text-sm font-bold focus:ring-2 focus:ring-orange-500 transition-all shadow-sm">
-                    <span class="absolute left-4 top-4.5 opacity-30 text-xl">🔍</span>
+                    <input type="text" id="search-inventory" placeholder="Cari bahan kopi..." class="w-full p-3 pl-10 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold focus:ring-2 focus:ring-orange-500 transition-all">
+                    <span class="absolute left-3 top-3.5 opacity-30 text-sm">🔍</span>
                 </div>
                 <div id="inventory-list" class="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-scroll no-scrollbar">
                     @foreach($stokBahan as $bahan)
                     <div class="inventory-item p-4 bg-gray-50 rounded-2xl transition-all border border-transparent hover:border-orange-100" data-name="{{ strtolower($bahan->nama_bahan) }}">
                         <div class="flex justify-between items-center mb-3"><span class="text-xs font-black uppercase text-gray-600 tracking-tighter">{{ $bahan->nama_bahan }}</span><span class="text-xs font-black {{ $bahan->stok <= $bahan->min_stok ? 'text-red-500 animate-pulse' : 'text-green-600' }}">{{ number_format($bahan->stok) }} {{ $bahan->satuan }}</span></div>
                         @if(Auth::user()->role == 'admin')
-                        <div class="flex space-x-2"><input type="number" id="restock-qty-{{ $bahan->id }}" placeholder="+ stok" class="flex-1 p-2 bg-white border border-gray-200 rounded-lg outline-none text-[10px] font-bold"><button onclick="restockItem({{ $bahan->id }})" class="bg-gray-900 text-white px-3 py-2 rounded-lg text-[9px] font-black uppercase hover:bg-orange-600 transition-all">Simpan</button></div>
+                        <div class="flex space-x-2"><input type="number" id="restock-qty-{{ $bahan->id }}" placeholder="+ stok" class="flex-1 p-2 bg-white border border-gray-200 rounded-lg outline-none text-[10px] font-bold"><button onclick="restockItem({{ $bahan->id }})" class="bg-gray-900 text-white px-3 py-2 rounded-lg text-[9px] font-black uppercase hover:bg-orange-600 transition-all">Update</button></div>
                         @endif
                     </div>
                     @endforeach
                 </div>
             </div>
-            <div class="p-6 pt-0"><button onclick="document.getElementById('inventory-modal').classList.replace('flex','hidden')" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black uppercase text-xs hover:bg-black transition-all">Selesai Memeriksa</button></div>
+            <div class="p-6 pt-0"><button onclick="document.getElementById('inventory-modal').classList.replace('flex','hidden')" class="w-full bg-gray-900 text-white py-3 rounded-xl font-black uppercase text-xs hover:bg-black transition-all">Selesai Cek</button></div>
+        </div>
+    </div>
+
+    <div id="receipt-modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-[300] p-4 backdrop-blur-sm">
+        <div id="modal-content" class="bg-white w-full max-w-sm rounded-[3rem] shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300 text-center text-xs font-mono">
+            <div class="bg-orange-500 p-8 text-white"><div class="text-4xl mb-2">☕</div><h2 class="text-2xl font-black uppercase tracking-widest">Street Coffee</h2></div>
+            <div class="p-8 space-y-4 text-left">
+                <div class="flex justify-between border-b border-dashed pb-2"><span>Customer:</span><span id="receipt-customer" class="font-black uppercase"></span></div>
+                <div class="flex justify-between border-b border-dashed pb-2"><span>Metode:</span><span id="receipt-method" class="font-black uppercase"></span></div>
+                <div id="receipt-cash-details" class="hidden"><div class="flex justify-between border-b border-dashed pb-2 text-gray-400"><span>Bayar:</span><span id="receipt-pay"></span></div><div class="flex justify-between border-b border-dashed pb-2 text-gray-400"><span>Kembali:</span><span id="receipt-change"></span></div></div>
+                <div id="receipt-items" class="py-2 space-y-2 max-h-40 overflow-y-auto"></div>
+                <div class="border-t-4 pt-6 flex justify-between text-lg font-black"><span>TOTAL</span><span id="receipt-total" class="text-orange-600"></span></div>
+            </div>
+            <div class="p-8 pt-0"><button onclick="window.location.reload()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black hover:bg-black transition-all uppercase tracking-widest shadow-xl">Tutup Nota</button></div>
         </div>
     </div>
 
     <script>
         let cart = [];
         
-        // 1. FORCED LOGIN MODAL (WAJIB ISI!)
+        // 1. FORCED SHIFT SYSTEM (ANTI-SKIP)
         window.addEventListener('DOMContentLoaded', () => {
-            const shiftActive = localStorage.getItem('shift_active');
-            if (!shiftActive) {
+            const cashier = localStorage.getItem('current_cashier');
+            if (!cashier) {
                 document.getElementById('shift-modal').classList.replace('hidden', 'flex');
             } else {
-                updateUIWithActiveShift();
+                updateUIWithActiveShift(cashier);
             }
         });
-
-        function updateUIWithActiveShift() {
-            const name = localStorage.getItem('current_cashier');
-            if(name) {
-                document.getElementById('main-greeting').innerHTML = `Halo, ${name}! ✨`;
-                document.getElementById('active-cashier-label').innerText = "Shift Saat Ini: " + name;
-            }
-        }
 
         function startShift() {
             const name = document.getElementById('cashier-name-input').value;
             const amount = document.getElementById('opening-cash').value;
-            if(!name || !amount) return alert('⚠️ Wajib isi Nama Kasir & Modal Awal untuk memulai operasional!');
+            if(!name || !amount) return alert('⚠️ Tiara, wajib isi Nama & Modal Laci dulu!');
             
             localStorage.setItem('shift_active', 'true');
             localStorage.setItem('current_cashier', name);
@@ -240,7 +246,12 @@
             localStorage.setItem('total_cash_sales', '0');
             
             document.getElementById('shift-modal').classList.replace('flex', 'hidden');
-            updateUIWithActiveShift();
+            updateUIWithActiveShift(name);
+        }
+
+        function updateUIWithActiveShift(name) {
+            document.getElementById('main-greeting').innerHTML = `Halo, ${name}! ✨`;
+            document.getElementById('active-cashier-label').innerText = "Shift Berjalan: " + name;
         }
 
         function openCloseShiftModal() { document.getElementById('close-shift-modal').classList.replace('hidden', 'flex'); }
@@ -248,16 +259,19 @@
         function endShift() {
             const name = localStorage.getItem('current_cashier'), opening = parseFloat(localStorage.getItem('opening_cash')) || 0, sales = parseFloat(localStorage.getItem('total_cash_sales')) || 0, closing = parseFloat(document.getElementById('closing-cash').value) || 0, expected = opening + sales, diff = closing - expected;
             let res = `<div class="text-left space-y-2 p-6 bg-gray-50 rounded-3xl border-2 ${diff < 0 ? 'border-red-100' : 'border-green-100'}">
-                <h3 class="font-black uppercase text-[10px] text-center mb-4 underline italic text-orange-600">Audit Penutupan Shift: ${name}</h3>
-                <div class="flex justify-between text-xs"><span>Modal Pembukaan:</span><span class="font-bold">Rp ${opening.toLocaleString()}</span></div>
-                <div class="flex justify-between text-xs"><span>Total Penjualan Tunai:</span><span class="font-bold">Rp ${sales.toLocaleString()}</span></div>
-                <hr class="border-dashed"><div class="flex justify-between text-xs font-black"><span>Saldo Seharusnya:</span><span>Rp ${expected.toLocaleString()}</span></div>
-                <div class="flex justify-between text-xs font-black text-blue-600"><span>Saldo Fisik Laci:</span><span>Rp ${closing.toLocaleString()}</span></div>
-                <hr class="border-dashed border-gray-300"><div class="flex justify-between ${diff < 0 ? 'text-red-500' : 'text-green-600'} font-black uppercase text-sm"><span>Status Laporan:</span><span>${diff < 0 ? 'MINUS Rp ' + Math.abs(diff).toLocaleString() : 'SEIMBANG/COCOK ✨'}</span></div></div>`;
-            localStorage.setItem('last_audit_html', res); localStorage.removeItem('shift_active'); localStorage.removeItem('current_cashier'); window.location.reload(); 
+                <h3 class="font-black uppercase text-[10px] text-center mb-4 underline italic">Audit Shift: ${name}</h3>
+                <div class="flex justify-between text-xs"><span>Kas Awal:</span><span class="font-bold">Rp ${opening.toLocaleString()}</span></div>
+                <div class="flex justify-between text-xs"><span>Omzet Tunai:</span><span class="font-bold">Rp ${sales.toLocaleString()}</span></div>
+                <hr class="border-dashed"><div class="flex justify-between text-xs font-black text-gray-700"><span>Harusnya:</span><span>Rp ${expected.toLocaleString()}</span></div>
+                <div class="flex justify-between text-xs font-black text-blue-600"><span>Fisik Laci:</span><span>Rp ${closing.toLocaleString()}</span></div>
+                <hr class="border-dashed border-gray-300"><div class="flex justify-between ${diff < 0 ? 'text-red-500' : 'text-green-600'} font-black uppercase text-sm"><span>Status Laporan:</span><span>${diff < 0 ? 'MINUS Rp ' + Math.abs(diff).toLocaleString() : 'COCOK ✨'}</span></div></div>`;
+            localStorage.setItem('last_audit_html', res); 
+            localStorage.removeItem('shift_active'); 
+            localStorage.removeItem('current_cashier');
+            window.location.reload(); 
         }
 
-        function voidTransaction(id) { if(confirm('Hapus transaksi? Stok akan dikembalikan.')) fetch(`/transaksi/${id}`, { method: "DELETE", headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" } }).then(() => window.location.reload()); }
+        function voidTransaction(id) { if(confirm('Hapus transaksi?')) fetch(`/transaksi/${id}`, { method: "DELETE", headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" } }).then(() => window.location.reload()); }
 
         function switchTab(t) {
             const pos = document.getElementById('section-pos'), rekap = document.getElementById('section-rekap'), bP = document.getElementById('btn-pos'), bR = document.getElementById('btn-rekap');
@@ -273,26 +287,9 @@
             btnPay.disabled = (kembalian < 0);
         });
 
-        document.querySelectorAll('.add-to-cart').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = btn.getAttribute('data-id'), name = btn.getAttribute('data-name'), price = parseInt(btn.getAttribute('data-price')), exists = cart.find(i => i.id === id);
-                if(exists) exists.qty++; else cart.push({id, name, price, qty: 1}); updateCartUI();
-            });
-        });
-
-        function updateCartUI() {
-            const container = document.getElementById('cart-container'), totalDisplay = document.getElementById('cart-total');
-            if(cart.length === 0) { container.innerHTML = `<p class="py-10 text-center font-black opacity-20 uppercase text-[10px]">Belum Ada Pesanan</p>`; totalDisplay.innerText = "Rp 0"; btnPay.disabled = true; return; }
-            let html = ''; let total = 0;
-            cart.forEach((item, index) => { total += (item.price * item.qty); html += `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl border mb-2 cart-item-enter"><div class="flex-1 pr-2"><p class="font-bold text-gray-800 text-[11px] truncate uppercase tracking-tighter">${item.name}</p><p class="text-[9px] text-gray-400 font-bold">${item.qty}x @ Rp ${item.price.toLocaleString()}</p></div><div class="flex items-center space-x-3"><span class="text-xs font-black text-orange-600">Rp ${(item.price * item.qty).toLocaleString()}</span><button onclick="cart.splice(${index},1);updateCartUI();" class="text-gray-300 hover:text-red-500 font-bold text-lg">&times;</button></div></div>`; });
-            container.innerHTML = html; totalDisplay.innerText = "Rp " + total.toLocaleString(); 
-            btnPay.disabled = (paymentMethod.value === 'Cash' && (parseInt(cashInput.value) || 0) < total);
-        }
-
         function performCheckout() {
             const n = document.getElementById('customer-name').value, m = paymentMethod.value, t = parseInt(document.getElementById('cart-total').innerText.replace(/[^0-9]/g,''));
-            if(!n) return alert('⚠️ Mohon isi Nama Pelanggan!'); 
-            btnPay.disabled = true;
+            if(!n) return alert('⚠️ Isi Nama Pelanggan!'); btnPay.disabled = true;
             fetch("{{ route('checkout') }}", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" }, body: JSON.stringify({ nama_customer: n, metode_pembayaran: m, total: t, items: cart }) })
             .then(r => r.json()).then(data => {
                 if(data.success) {
@@ -302,16 +299,33 @@
             });
         }
 
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id'), name = btn.getAttribute('data-name'), price = parseInt(btn.getAttribute('data-price')), exists = cart.find(i => i.id === id);
+                if(exists) exists.qty++; else cart.push({id, name, price, qty: 1}); updateCartUI();
+            });
+        });
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-container'), totalDisplay = document.getElementById('cart-total');
+            if(cart.length === 0) { container.innerHTML = `<p class="py-10 text-center font-black opacity-20 uppercase text-[10px]">Keranjang Kosong</p>`; totalDisplay.innerText = "Rp 0"; btnPay.disabled = true; return; }
+            let html = ''; let total = 0;
+            cart.forEach((item, index) => { total += (item.price * item.qty); html += `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl border mb-2 cart-item-enter"><div class="flex-1 pr-2"><p class="font-bold text-gray-800 text-[11px] truncate uppercase tracking-tighter">${item.name}</p><p class="text-[9px] text-gray-400 font-bold">${item.qty}x @ Rp ${item.price.toLocaleString()}</p></div><div class="flex items-center space-x-3"><span class="text-xs font-black text-orange-600">Rp ${(item.price * item.qty).toLocaleString()}</span><button onclick="cart.splice(${index},1);updateCartUI();" class="text-gray-300 hover:text-red-500 font-bold text-lg">&times;</button></div></div>`; });
+            container.innerHTML = html; totalDisplay.innerText = "Rp " + total.toLocaleString(); 
+            btnPay.disabled = (paymentMethod.value === 'Cash' && (parseInt(cashInput.value) || 0) < total);
+        }
+
         document.getElementById('search-inventory').addEventListener('input', function() {
             const q = this.value.toLowerCase();
             document.querySelectorAll('.inventory-item').forEach(item => { item.style.display = item.getAttribute('data-name').includes(q) ? 'block' : 'none'; });
         });
 
+        function restockItem(id) { const q = document.getElementById('restock-qty-'+id).value; fetch("{{ route('restock') }}", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" }, body: JSON.stringify({ bahan_id: id, jumlah: q }) }).then(() => window.location.reload()); }
+        function resetShiftManual() { if(confirm('Reset shift manual?')) { localStorage.clear(); window.location.reload(); } }
+        
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => { const target = btn.getAttribute('data-target'); document.querySelectorAll('.filter-btn').forEach(b => b.classList.replace('bg-orange-100','text-gray-400')); btn.classList.add('bg-orange-100', 'text-orange-600'); document.querySelectorAll('.menu-item').forEach(item => { item.style.display = (target === 'all' || item.dataset.category === target) ? 'block' : 'none'; }); });
         });
-
-        function restockItem(id) { const q = document.getElementById('restock-qty-'+id).value; fetch("{{ route('restock') }}", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" }, body: JSON.stringify({ bahan_id: id, jumlah: q }) }).then(() => window.location.reload()); }
     </script>
 </body>
 </html>
