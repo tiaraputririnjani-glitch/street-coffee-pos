@@ -126,4 +126,13 @@ class TransaksiController extends Controller
             'message' => 'Stok ' . $bahan->nama_bahan . ' berhasil ditambah!'
         ]);
     }
+    public function destroy($id) 
+{
+    $transaksi = Transaksi::find($id);
+    if($transaksi) {
+        $transaksi->delete();
+        return response()->json(['success' => true]);
+    }
+    return response()->json(['success' => false], 404);
+}
 }

@@ -24,4 +24,6 @@ Route::middleware(['auth'])->group(function () {
 
     // JALUR BARU: ISI ULANG STOK (Biar Tombol "Update" di Gudang Jalan)
     Route::post('/restock', [TransaksiController::class, 'restock'])->name('restock');
+
+    Route::delete('/transaksi/{id}', [TransaksiController::class, 'destroy'])->name('transaksi.destroy');
 });
