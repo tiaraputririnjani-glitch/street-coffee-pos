@@ -31,7 +31,7 @@ class TransaksiController extends Controller
     }
 
     /**
-     * Menyimpan Transaksi
+     * Menyimpan Transaksi & Potong Stok
      */
     public function checkout(Request $request)
     {
@@ -57,6 +57,7 @@ class TransaksiController extends Controller
                     'created_at' => now()
                 ]);
 
+                // Potong stok berdasarkan resep
                 foreach ($request->items as $item) {
                     $recipes = Recipe::where('menu_id', $item['id'])->get();
                     foreach ($recipes as $recipe) {
@@ -80,26 +81,49 @@ class TransaksiController extends Controller
     }
 
     /**
-     * FITUR LAPORAN (Baru & Sudah Diperbaiki)
+     * FITUR LAPORAN & SALDO (Cash vs Digital)
      */
     public function getReport(Request $request) 
-{
-    $start = $request->start_date . " 00:00:00";
-    $end = $request->end_date . " 23:59:59";
+    {
+        $start = $request->start_date . " 00:00:00";
+        $end = $request->end_date . " 23:59:59";
 
-    $transaksi = Transaksi::whereBetween('created_at', [$start, $end])->get();
+        $transaksi = Transaksi::whereBetween('created_at', [$start, $end])->get();
 
-    // Hitung saldo per metode pembayaran
-    $saldo_cash = Transaksi::whereBetween('created_at', [$start, $end])->where('metode_pembayaran', 'Cash')->sum('total_harga');
-    $saldo_digital = Transaksi::whereBetween('created_at', [$start, $end])->where('metode_pembayaran', '!=', 'Cash')->sum('total_harga');
+        // Hitung rincian saldo (Permintaan Aulia & Tiara)
+        $saldo_cash = Transaksi::whereBetween('created_at', [$start, $end])
+                                ->where('metode_pembayaran', 'Cash')
+                                ->sum('total_harga');
+                                
+        $saldo_digital = Transaksi::whereBetween('created_at', [$start, $end])
+                                ->where('metode_pembayaran', '!=', 'Cash')
+                                ->sum('total_harga');
 
-    return response()->json([
-        'total_omzet' => $transaksi->sum('total_harga'),
-        'saldo_cash' => $saldo_cash,
-        'saldo_digital' => $saldo_digital,
-        'total_order' => $transaksi->count(),
-        'data' => $transaksi
-    ]);
+        return response()->json([
+            'total_omzet' => $transaksi->sum('total_harga'),
+            'saldo_cash' => $saldo_cash,
+            'saldo_digital' => $saldo_digital,
+            'total_order' => $transaksi->count(),
+            'data' => $transaksi
+        ]);
+    }
 
+    /**
+     * FITUR ISI ULANG STOK (Restock)
+     */
+    public function restock(Request $request) 
+    {
+        $request->validate([
+            'bahan_id' => 'required',
+            'jumlah' => 'required|numeric|min:1'
+        ]);
+
+        $bahan = BahanBaku::find($request->bahan_id);
+        $bahan->increment('stok', $request->jumlah);
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Stok ' . $bahan->nama_bahan . ' berhasil ditambah!'
+        ]);
     }
 }

@@ -19,6 +19,9 @@ Route::middleware(['auth'])->group(function () {
     // Proses Simpan Transaksi
     Route::post('/checkout', [TransaksiController::class, 'checkout'])->name('checkout');
 
-    // JALUR BARU: Ambil Data Laporan (Biar Tombol "Lihat Laporan" Jalan)
+    // Ambil Data Laporan (Biar Tombol "Lihat Laporan" Jalan)
     Route::get('/get-report', [TransaksiController::class, 'getReport'])->name('get-report');
+
+    // JALUR BARU: ISI ULANG STOK (Biar Tombol "Update" di Gudang Jalan)
+    Route::post('/restock', [TransaksiController::class, 'restock'])->name('restock');
 });
