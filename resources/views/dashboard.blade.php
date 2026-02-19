@@ -29,13 +29,26 @@
     <div id="shift-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-[100] p-4 backdrop-blur-md">
         <div class="bg-white w-full max-w-sm rounded-[3rem] p-10 text-center shadow-2xl">
             <div class="text-4xl mb-4">☀️</div>
-            <h2 class="text-xl font-black text-gray-800 uppercase mb-2">Buka Kasir</h2>
-            <p class="text-xs text-gray-400 font-bold mb-8 italic">Masukkan uang modal di laci hari ini</p>
+            <h2 class="text-xl font-black text-gray-800 uppercase mb-2">Mulai Shift</h2>
+            <p class="text-xs text-gray-400 font-bold mb-8 italic">Masukkan uang modal (Kas Awal) di laci</p>
             <div class="mb-8 relative">
                 <span class="absolute left-4 top-4 font-black text-orange-300">Rp</span>
                 <input type="number" id="opening-cash" placeholder="0" class="w-full p-4 pl-12 bg-gray-50 border border-gray-100 rounded-2xl outline-none text-center text-xl font-black text-orange-600 focus:ring-4 focus:ring-orange-100">
             </div>
             <button onclick="startShift()" class="w-full bg-orange-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-orange-600 active:scale-95 transition-all">Mulai Jualan</button>
+        </div>
+    </div>
+
+    <div id="close-shift-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-[100] p-4 backdrop-blur-md">
+        <div class="bg-white w-full max-w-sm rounded-[3rem] p-10 text-center shadow-2xl">
+            <div class="text-4xl mb-4">🌙</div>
+            <h2 class="text-xl font-black text-gray-800 uppercase mb-2">Tutup Kasir</h2>
+            <p class="text-xs text-gray-400 font-bold mb-8 italic">Hitung uang fisik di laci saat ini</p>
+            <div class="mb-8 relative">
+                <span class="absolute left-4 top-4 font-black text-orange-300">Rp</span>
+                <input type="number" id="closing-cash" placeholder="0" class="w-full p-4 pl-12 bg-gray-50 border border-gray-100 rounded-2xl outline-none text-center text-xl font-black text-orange-600 focus:ring-4 focus:ring-orange-100">
+            </div>
+            <button onclick="endShift()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-black active:scale-95 transition-all">Tutup & Kirim Laporan</button>
         </div>
     </div>
 
@@ -49,6 +62,7 @@
             <button class="filter-btn p-2 md:p-3 text-gray-400 hover:text-orange-600 rounded-xl text-sm flex-shrink-0" data-target="Snack">Snack</button>
             
             <div class="md:mt-auto flex flex-row md:flex-col items-center space-x-4 md:space-x-0 md:space-y-4">
+                <button onclick="openCloseShiftModal()" class="p-2 md:p-3 text-gray-400 hover:text-red-500 transition-colors text-xl" title="Tutup Shift Sekarang">🔒</button>
                 <button id="open-inventory" class="p-2 md:p-3 text-gray-400 hover:text-orange-500 transition-colors text-xl" title="Cek Stok Gudang">📦</button>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
@@ -68,12 +82,12 @@
             <div id="section-pos" class="space-y-8">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h1 class="text-xl md:text-2xl font-black text-gray-800 tracking-tight uppercase">Halo, {{ Auth::user()->name }}!</h1>
-                        <p class="text-gray-400 text-xs font-bold">Pilih menu untuk pesanan baru</p>
+                        <h1 class="text-xl md:text-2xl font-black text-gray-800 tracking-tight uppercase">Street Coffee</h1>
+                        <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Shift Ara Sedang Berjalan ⚡</p>
                     </div>
                     @if(Auth::user()->role == 'admin')
                     <div class="bg-orange-500 p-3 md:p-4 rounded-2xl shadow-lg text-white text-right">
-                        <span class="text-[9px] uppercase font-black opacity-70 block tracking-wider">Pendapatan Hari Ini</span>
+                        <span class="text-[9px] uppercase font-black opacity-70 block">Pendapatan Hari Ini</span>
                         <span class="text-lg font-black">Rp {{ number_format($pendapatan) }}</span>
                     </div>
                     @endif
@@ -97,29 +111,16 @@
             </div>
 
             <div id="section-rekap" class="hidden space-y-6">
-                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-                    <h2 class="text-xl font-black text-gray-800 mb-6 uppercase tracking-tighter">Filter Laporan Penjualan</h2>
-                    <div class="flex flex-wrap gap-4 items-end">
-                        <div class="flex-1 min-w-[200px]">
-                            <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block tracking-widest">Dari Tanggal</label>
-                            <input type="date" id="date-start" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold">
-                        </div>
-                        <div class="flex-1 min-w-[200px]">
-                            <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block tracking-widest">Hingga Tanggal</label>
-                            <input type="date" id="date-end" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold">
-                        </div>
-                        <button onclick="filterReport()" class="bg-gray-900 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg">Lihat Laporan</button>
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 text-center">
+                    <h2 class="text-xl font-black text-gray-800 mb-6 uppercase">Hasil Audit Shift Terakhir</h2>
+                    <div id="audit-result" class="space-y-4">
+                        <p class="text-xs text-gray-400 font-bold italic">Pilih filter laporan atau tunggu data tutup kasir...</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center">
-                        <p class="text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Total Omzet Periode Ini</p>
-                        <p id="rekap-total-display" class="text-3xl font-black text-orange-600 tracking-tighter">Rp 0</p>
-                    </div>
-                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center flex flex-col items-center justify-center">
-                        <button onclick="localStorage.removeItem('shift_active'); window.location.reload();" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-red-500 hover:text-white transition-all">⚠️ Reset Shift Kasir</button>
-                    </div>
+                <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center">
+                    <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Total Omzet Filter</p>
+                    <p id="rekap-total-display" class="text-3xl font-black text-orange-600 tracking-tighter">Rp 0</p>
                 </div>
             </div>
         </div>
@@ -130,13 +131,13 @@
                 <input type="text" id="customer-name" placeholder="Nama Pelanggan..." class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm font-bold">
             </div>
 
-            <div id="cart-container" class="space-y-3 mb-6">
+            <div id="cart-container" class="space-y-3 mb-6 flex-1">
                 <div class="flex flex-col items-center justify-center text-gray-300 italic text-sm py-10"><p>Pilih menu...</p></div>
             </div>
 
             <div class="border-t border-gray-50 pt-4 space-y-4">
                 <div class="flex justify-between items-center">
-                    <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Total Bayar</span>
+                    <span class="text-xs font-black text-gray-400 uppercase">Total Bayar</span>
                     <span id="cart-total" class="text-2xl font-black text-orange-600 tracking-tighter">Rp 0</span>
                 </div>
                 <div class="flex flex-col space-y-3">
@@ -153,7 +154,7 @@
                             <input type="number" id="cash-amount" placeholder="0" class="w-full p-2 bg-white border border-orange-200 rounded-lg outline-none text-sm font-bold text-gray-800 text-center">
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-black text-gray-400 uppercase">Kembalian</span>
+                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Kembalian</span>
                             <span id="change-amount" class="text-sm font-black text-orange-600">Rp 0</span>
                         </div>
                     </div>
@@ -165,26 +166,20 @@
     </div>
 
     <div id="inventory-modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-[110] p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-cart-item-enter">
-            <div class="bg-orange-500 p-6 text-white flex justify-between items-center">
-                <h2 class="text-xl font-black uppercase tracking-tight">📦 Stok Gudang</h2>
-                <button id="close-inventory" class="text-3xl font-bold hover:text-black">&times;</button>
-            </div>
+        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden">
+            <div class="bg-orange-500 p-6 text-white flex justify-between items-center"><h2 class="text-xl font-black uppercase">📦 Gudang</h2><button id="close-inventory" class="text-3xl font-bold hover:text-black">&times;</button></div>
             <div class="p-6">
-                <div class="relative mb-6">
-                    <input type="text" id="search-inventory" placeholder="Cari bahan..." class="w-full p-3 pl-10 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold focus:ring-2 focus:ring-orange-500">
-                    <span class="absolute left-3 top-3.5 opacity-30 text-sm">🔍</span>
-                </div>
-                <div id="inventory-list" class="space-y-2 max-h-[350px] overflow-y-auto pr-2 custom-scroll no-scrollbar">
+                <input type="text" id="search-inventory" placeholder="Cari bahan..." class="w-full p-3 bg-gray-50 border rounded-xl outline-none text-sm font-bold mb-4 focus:ring-2 focus:ring-orange-500">
+                <div id="inventory-list" class="space-y-2 max-h-[350px] overflow-y-auto no-scrollbar">
                     @foreach($stokBahan as $bahan)
-                    <div class="inventory-item flex justify-between items-center p-3 bg-gray-50 rounded-xl transition-all hover:bg-orange-50" data-name="{{ strtolower($bahan->nama_bahan) }}">
+                    <div class="inventory-item flex justify-between items-center p-3 bg-gray-50 rounded-xl" data-name="{{ strtolower($bahan->nama_bahan) }}">
                         <span class="text-xs font-black text-gray-600 uppercase">{{ $bahan->nama_bahan }}</span>
-                        <span class="text-xs font-black {{ $bahan->stok <= $bahan->min_stok ? 'text-red-500 animate-pulse' : 'text-green-600' }}">{{ number_format($bahan->stok) }} {{ $bahan->satuan }}</span>
+                        <span class="text-xs font-black {{ $bahan->stok <= $bahan->min_stok ? 'text-red-500' : 'text-green-600' }}">{{ number_format($bahan->stok) }} {{ $bahan->satuan }}</span>
                     </div>
                     @endforeach
                 </div>
             </div>
-            <div class="p-6 pt-0"><button id="btn-close-inv" class="w-full bg-gray-900 text-white py-3 rounded-xl font-black uppercase text-xs">Selesai Cek</button></div>
+            <div class="p-6 pt-0"><button id="btn-close-inv" class="w-full bg-gray-900 text-white py-3 rounded-xl font-black uppercase text-xs">Selesai</button></div>
         </div>
     </div>
 
@@ -192,8 +187,8 @@
         <div id="modal-content" class="bg-white w-full max-w-sm rounded-[3rem] shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
             <div class="bg-orange-500 p-8 text-white text-center">
                 <div class="text-4xl mb-2">☕</div>
-                <h2 class="text-2xl font-black uppercase tracking-tighter">Street Coffee</h2>
-                <p class="text-[10px] font-bold opacity-60 uppercase tracking-widest">Transaksi Berhasil</p>
+                <h2 class="text-2xl font-black uppercase tracking-widest">Street Coffee</h2>
+                <p class="text-[10px] font-bold opacity-60 uppercase">Transaksi Berhasil</p>
             </div>
             <div class="p-8 space-y-4 text-xs font-mono text-gray-600">
                 <div class="flex justify-between border-b border-dashed pb-2"><span>Customer:</span><span id="receipt-customer" class="font-black text-gray-900 uppercase"></span></div>
@@ -211,8 +206,8 @@
 
     <script>
         let cart = [];
-
-        // 1. INGATAN SHIFT (Cek saat halaman dibuka)
+        
+        // 1. LOGIKA SHIFT SEMPURNA (MODAL AWAL & AKHIR)
         window.addEventListener('DOMContentLoaded', () => {
             if (!localStorage.getItem('shift_active')) {
                 document.getElementById('shift-modal').classList.replace('hidden', 'flex');
@@ -222,11 +217,51 @@
         function startShift() {
             const amount = document.getElementById('opening-cash').value;
             if(!amount || amount < 0) return alert('Input uang modal dulu ya!');
+            
             localStorage.setItem('shift_active', 'true');
+            localStorage.setItem('opening_cash', amount);
+            localStorage.setItem('total_cash_sales', '0'); // Reset total jualan tunai
+            
             document.getElementById('shift-modal').classList.replace('flex', 'hidden');
         }
 
-        // 2. TAB SWITCHING (ADMIN ONLY)
+        function openCloseShiftModal() {
+            document.getElementById('close-shift-modal').classList.replace('hidden', 'flex');
+        }
+
+        function endShift() {
+            const opening = parseFloat(localStorage.getItem('opening_cash')) || 0;
+            const sales = parseFloat(localStorage.getItem('total_cash_sales')) || 0;
+            const closing = parseFloat(document.getElementById('closing-cash').value) || 0;
+            const expected = opening + sales;
+            const difference = closing - expected;
+
+            // Logika Deteksi Minus
+            let resultHtml = `
+                <div class="text-left space-y-2 p-6 bg-gray-50 rounded-3xl">
+                    <div class="flex justify-between"><span>Kas Awal:</span><span class="font-bold">Rp ${opening.toLocaleString()}</span></div>
+                    <div class="flex justify-between"><span>Total Jualan (Tunai):</span><span class="font-bold">Rp ${sales.toLocaleString()}</span></div>
+                    <hr class="border-dashed">
+                    <div class="flex justify-between text-orange-600 font-black"><span>Uang Seharusnya:</span><span>Rp ${expected.toLocaleString()}</span></div>
+                    <div class="flex justify-between text-blue-600 font-black"><span>Uang Fisik:</span><span>Rp ${closing.toLocaleString()}</span></div>
+                    <hr class="border-dashed">
+                    <div class="flex justify-between ${difference < 0 ? 'text-red-500' : 'text-green-600'} font-black text-lg">
+                        <span>${difference < 0 ? 'MINUS / SELISIH:' : 'SURPLUS / COCOK:'}</span>
+                        <span>Rp ${difference.toLocaleString()}</span>
+                    </div>
+                </div>
+            `;
+            
+            localStorage.setItem('last_audit_html', resultHtml);
+            localStorage.removeItem('shift_active');
+            localStorage.removeItem('opening_cash');
+            localStorage.removeItem('total_cash_sales');
+            
+            alert('Shift Berhasil Ditutup!');
+            window.location.reload();
+        }
+
+        // 2. TAB SWITCHING & REKAP
         function switchTab(target) {
             const pos = document.getElementById('section-pos');
             const rekap = document.getElementById('section-rekap');
@@ -241,39 +276,25 @@
                 pos.classList.add('hidden'); rekap.classList.remove('hidden');
                 btnRekap.classList.add('border-b-4', 'border-orange-500', 'text-orange-600');
                 btnPos.classList.remove('border-b-4', 'border-orange-500', 'text-orange-600');
+                
+                // Munculkan hasil audit terakhir di tab rekap
+                const lastAudit = localStorage.getItem('last_audit_html');
+                if(lastAudit) document.getElementById('audit-result').innerHTML = lastAudit;
             }
         }
 
-        // 3. FITUR LAPORAN (REPORT)
         function filterReport() {
             const start = document.getElementById('date-start').value;
             const end = document.getElementById('date-end').value;
-
-            if(!start || !end) return alert('Pilih rentang tanggal dulu, Tiara!');
-
+            if(!start || !end) return alert('Pilih tanggal dulu!');
             fetch(`/get-report?start_date=${start}&end_date=${end}`)
                 .then(r => r.json())
                 .then(data => {
                     document.getElementById('rekap-total-display').innerText = "Rp " + data.total_omzet.toLocaleString();
-                    if(data.total_order === 0) alert('Belum ada penjualan di tanggal ini.');
-                })
-                .catch(() => alert('Gangguan koneksi!'));
+                });
         }
 
-        // 4. GUDANG MODAL & SEARCH
-        const invModal = document.getElementById('inventory-modal');
-        document.getElementById('open-inventory').addEventListener('click', () => invModal.classList.remove('hidden'));
-        document.getElementById('close-inventory').addEventListener('click', () => invModal.classList.add('hidden'));
-        document.getElementById('btn-close-inv').addEventListener('click', () => invModal.classList.add('hidden'));
-
-        document.getElementById('search-inventory').addEventListener('input', function() {
-            const query = this.value.toLowerCase();
-            document.querySelectorAll('.inventory-item').forEach(item => {
-                item.style.display = item.getAttribute('data-name').includes(query) ? 'flex' : 'none';
-            });
-        });
-
-        // 5. KERANJANG & CHECKOUT
+        // 3. LOGIKA KASIR (GUDANG, CART, CHECKOUT)
         const paymentMethod = document.getElementById('payment-method');
         const cashInput = document.getElementById('cash-amount');
         const changeDisplay = document.getElementById('change-amount');
@@ -289,7 +310,7 @@
             const bayar = parseInt(this.value) || 0;
             const kembalian = bayar - total;
             changeDisplay.innerText = "Rp " + (kembalian >= 0 ? kembalian.toLocaleString() : "0");
-            btnPay.disabled = (this.value === '' || (this.value !== '' && kembalian < 0));
+            btnPay.disabled = (kembalian < 0);
         });
 
         document.querySelectorAll('.add-to-cart').forEach(btn => {
@@ -306,24 +327,16 @@
         function updateCartUI() {
             const container = document.getElementById('cart-container');
             const totalDisplay = document.getElementById('cart-total');
-
             if(cart.length === 0) {
-                container.innerHTML = `<div class="flex flex-col items-center justify-center text-gray-300 italic py-10"><p>Pesanan kosong...</p></div>`;
+                container.innerHTML = `<div class="flex flex-col items-center justify-center text-gray-300 italic py-10"><p>Belum ada menu...</p></div>`;
                 totalDisplay.innerText = "Rp 0"; btnPay.disabled = true; return;
             }
-
             let html = ''; let total = 0;
             cart.forEach((item, index) => {
                 total += (item.price * item.qty);
-                html += `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl border cart-item-enter">
-                    <div class="flex-1 pr-2">
-                        <p class="font-bold text-gray-800 text-[11px] truncate uppercase">${item.name}</p>
-                        <p class="text-[9px] text-gray-400 font-bold">${item.qty}x @ Rp ${item.price.toLocaleString()}</p>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <span class="text-xs font-black text-orange-600">Rp ${(item.price * item.qty).toLocaleString()}</span>
-                        <button onclick="removeItem(${index})" class="text-gray-300 hover:text-red-500 font-bold text-lg">&times;</button>
-                    </div>
+                html += `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl border mb-2 cart-item-enter">
+                    <div class="flex-1 pr-2"><p class="font-bold text-gray-800 text-[11px] truncate uppercase">${item.name}</p><p class="text-[9px] text-gray-400 font-bold">${item.qty}x @ Rp ${item.price.toLocaleString()}</p></div>
+                    <div class="flex items-center space-x-3"><span class="text-xs font-black text-orange-600">Rp ${(item.price * item.qty).toLocaleString()}</span><button onclick="removeItem(${index})" class="text-gray-300 hover:text-red-500 font-bold text-lg">&times;</button></div>
                 </div>`;
             });
             container.innerHTML = html;
@@ -338,9 +351,7 @@
                 const target = btn.getAttribute('data-target');
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.replace('bg-orange-100','text-gray-400'));
                 btn.classList.add('bg-orange-100', 'text-orange-600');
-                document.querySelectorAll('.menu-item').forEach(item => {
-                    item.style.display = (target === 'all' || item.dataset.category === target) ? 'block' : 'none';
-                });
+                document.querySelectorAll('.menu-item').forEach(item => { item.style.display = (target === 'all' || item.dataset.category === target) ? 'block' : 'none'; });
             });
         });
 
@@ -348,8 +359,8 @@
             const name = document.getElementById('customer-name').value;
             const method = paymentMethod.value;
             const totalVal = parseInt(document.getElementById('cart-total').innerText.replace(/[^0-9]/g,''));
-            if(!name) return alert('⚠️ Tulis nama pelanggan!');
-            this.disabled = true; this.innerText = 'WAIT...';
+            if(!name) return alert('Isi nama pelanggan!');
+            this.disabled = true;
 
             fetch("{{ route('checkout') }}", {
                 method: "POST",
@@ -359,6 +370,12 @@
             .then(r => r.json())
             .then(data => {
                 if(data.success) {
+                    // Update Total Jualan Tunai untuk Laporan Minus
+                    if(method === 'Cash') {
+                        const currentSales = parseFloat(localStorage.getItem('total_cash_sales')) || 0;
+                        localStorage.setItem('total_cash_sales', currentSales + totalVal);
+                    }
+                    
                     document.getElementById('receipt-customer').innerText = name;
                     document.getElementById('receipt-method').innerText = method;
                     document.getElementById('receipt-total').innerText = "Rp " + totalVal.toLocaleString();
@@ -374,6 +391,16 @@
                     setTimeout(() => document.getElementById('modal-content').classList.replace('opacity-0','opacity-100'), 50);
                 } else alert('Gagal: ' + data.message);
             });
+        });
+
+        // GUDANG LOGIC
+        const invModal = document.getElementById('inventory-modal');
+        document.getElementById('open-inventory').addEventListener('click', () => invModal.classList.remove('hidden'));
+        document.getElementById('close-inventory').addEventListener('click', () => invModal.classList.add('hidden'));
+        document.getElementById('btn-close-inv').addEventListener('click', () => invModal.classList.add('hidden'));
+        document.getElementById('search-inventory').addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            document.querySelectorAll('.inventory-item').forEach(item => { item.style.display = item.getAttribute('data-name').includes(query) ? 'flex' : 'none'; });
         });
     </script>
 </body>
