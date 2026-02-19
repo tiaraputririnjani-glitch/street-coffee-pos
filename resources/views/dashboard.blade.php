@@ -69,11 +69,11 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h1 class="text-xl md:text-2xl font-black text-gray-800 tracking-tight uppercase">Halo, {{ Auth::user()->name }}!</h1>
-                        <p class="text-gray-400 text-xs font-bold italic">Street Coffee Premium POS ✨</p>
+                        <p class="text-gray-400 text-xs font-bold">Pilih menu untuk pesanan baru</p>
                     </div>
                     @if(Auth::user()->role == 'admin')
                     <div class="bg-orange-500 p-3 md:p-4 rounded-2xl shadow-lg text-white text-right">
-                        <span class="text-[9px] uppercase font-black opacity-70 block">Pendapatan Hari Ini</span>
+                        <span class="text-[9px] uppercase font-black opacity-70 block tracking-wider">Pendapatan Hari Ini</span>
                         <span class="text-lg font-black">Rp {{ number_format($pendapatan) }}</span>
                     </div>
                     @endif
@@ -88,72 +88,50 @@
                         <h3 class="font-bold text-gray-800 mb-1 text-sm truncate uppercase tracking-tighter">{{ $menu->nama_menu }}</h3>
                         <div class="flex justify-between items-center">
                             <span class="text-orange-600 font-black text-sm">Rp {{ number_format($menu->harga) }}</span>
-                            <button class="add-to-cart bg-gray-900 text-white w-8 h-8 rounded-xl hover:bg-orange-600 transition-all shadow-md flex items-center justify-center font-bold"
+                            <button class="add-to-cart bg-gray-900 text-white w-8 h-8 rounded-xl hover:bg-orange-600 active:scale-90 transition-all shadow-md flex items-center justify-center font-bold"
                                 data-id="{{ $menu->id }}" data-name="{{ $menu->nama_menu }}" data-price="{{ $menu->harga }}">+</button>
                         </div>
                     </div>
                     @endforeach
                 </div>
-
-                @if(Auth::user()->role == 'admin')
-                <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 mb-10">
-                    <h2 class="text-lg font-black text-gray-800 mb-6 uppercase">📋 Transaksi Terakhir</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left min-w-[500px]">
-                            <thead>
-                                <tr class="text-gray-400 text-[10px] uppercase font-black border-b border-gray-50">
-                                    <th class="pb-4 px-2">Waktu</th>
-                                    <th class="pb-4 px-2">Customer</th>
-                                    <th class="pb-4 px-2">Metode</th>
-                                    <th class="pb-4 px-2 text-right">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                @foreach($riwayat as $trx)
-                                <tr class="text-xs group hover:bg-orange-50 transition-colors">
-                                    <td class="py-4 text-gray-400 px-2">{{ $trx->created_at->format('H:i') }}</td>
-                                    <td class="py-4 font-bold text-gray-800 px-2 uppercase">{{ $trx->nama_customer }}</td>
-                                    <td class="py-4 px-2"><span class="bg-gray-100 px-2 py-1 rounded text-[10px] font-black uppercase text-gray-500 italic">{{ $trx->metode_pembayaran }}</span></td>
-                                    <td class="py-4 text-right font-black text-orange-600 px-2">Rp {{ number_format($trx->total_harga) }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                @endif
             </div>
 
             <div id="section-rekap" class="hidden space-y-6">
                 <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-                    <h2 class="text-xl font-black text-gray-800 mb-6 uppercase">Filter Laporan Penjualan</h2>
+                    <h2 class="text-xl font-black text-gray-800 mb-6 uppercase tracking-tighter">Filter Laporan Penjualan</h2>
                     <div class="flex flex-wrap gap-4 items-end">
                         <div class="flex-1 min-w-[200px]">
-                            <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block tracking-widest">Rentang Tanggal</label>
+                            <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block tracking-widest">Dari Tanggal</label>
                             <input type="date" id="date-start" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold">
                         </div>
                         <div class="flex-1 min-w-[200px]">
                             <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block tracking-widest">Hingga Tanggal</label>
                             <input type="date" id="date-end" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold">
                         </div>
-                        <button class="bg-gray-900 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg">Lihat Laporan</button>
+                        <button onclick="filterReport()" class="bg-gray-900 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg">Lihat Laporan</button>
                     </div>
                 </div>
-                <button onclick="localStorage.removeItem('shift_active'); window.location.reload();" class="text-[10px] font-black text-red-400 uppercase">⚠️ Reset Status Shift Kasir</button>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center">
+                        <p class="text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Total Omzet Periode Ini</p>
+                        <p id="rekap-total-display" class="text-3xl font-black text-orange-600 tracking-tighter">Rp 0</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center flex flex-col items-center justify-center">
+                        <button onclick="localStorage.removeItem('shift_active'); window.location.reload();" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-red-500 hover:text-white transition-all">⚠️ Reset Shift Kasir</button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="w-full md:w-96 bg-white p-6 shadow-2xl flex flex-col border-l border-gray-100 h-full overflow-y-auto z-20 no-scrollbar">
             <h2 class="text-xl font-black text-gray-800 mb-6 flex items-center tracking-tighter uppercase">🛒 Pesanan</h2>
-            
             <div class="space-y-4 mb-4">
                 <input type="text" id="customer-name" placeholder="Nama Pelanggan..." class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm font-bold">
             </div>
 
             <div id="cart-container" class="space-y-3 mb-6">
-                <div class="flex flex-col items-center justify-center text-gray-300 italic text-sm py-10">
-                    <p>Pilih menu...</p>
-                </div>
+                <div class="flex flex-col items-center justify-center text-gray-300 italic text-sm py-10"><p>Pilih menu...</p></div>
             </div>
 
             <div class="border-t border-gray-50 pt-4 space-y-4">
@@ -161,9 +139,8 @@
                     <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Total Bayar</span>
                     <span id="cart-total" class="text-2xl font-black text-orange-600 tracking-tighter">Rp 0</span>
                 </div>
-                
                 <div class="flex flex-col space-y-3">
-                    <select id="payment-method" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold text-gray-700">
+                    <select id="payment-method" class="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold text-gray-700 shadow-sm">
                         <option value="Cash">💵 Cash / Tunai</option>
                         <option value="Dana">💙 Dana</option>
                         <option value="Gopay">💚 Gopay</option>
@@ -188,19 +165,19 @@
     </div>
 
     <div id="inventory-modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-[110] p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden">
+        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-cart-item-enter">
             <div class="bg-orange-500 p-6 text-white flex justify-between items-center">
                 <h2 class="text-xl font-black uppercase tracking-tight">📦 Stok Gudang</h2>
                 <button id="close-inventory" class="text-3xl font-bold hover:text-black">&times;</button>
             </div>
             <div class="p-6">
                 <div class="relative mb-6">
-                    <input type="text" id="search-inventory" placeholder="Cari bahan..." class="w-full p-3 pl-10 bg-gray-50 border rounded-xl outline-none text-sm font-bold focus:ring-2 focus:ring-orange-500">
+                    <input type="text" id="search-inventory" placeholder="Cari bahan..." class="w-full p-3 pl-10 bg-gray-50 border border-gray-100 rounded-xl outline-none text-sm font-bold focus:ring-2 focus:ring-orange-500">
                     <span class="absolute left-3 top-3.5 opacity-30 text-sm">🔍</span>
                 </div>
-                <div id="inventory-list" class="space-y-2 max-h-[350px] overflow-y-auto pr-2 no-scrollbar">
+                <div id="inventory-list" class="space-y-2 max-h-[350px] overflow-y-auto pr-2 custom-scroll no-scrollbar">
                     @foreach($stokBahan as $bahan)
-                    <div class="inventory-item flex justify-between items-center p-3 bg-gray-50 rounded-xl transition-all" data-name="{{ strtolower($bahan->nama_bahan) }}">
+                    <div class="inventory-item flex justify-between items-center p-3 bg-gray-50 rounded-xl transition-all hover:bg-orange-50" data-name="{{ strtolower($bahan->nama_bahan) }}">
                         <span class="text-xs font-black text-gray-600 uppercase">{{ $bahan->nama_bahan }}</span>
                         <span class="text-xs font-black {{ $bahan->stok <= $bahan->min_stok ? 'text-red-500 animate-pulse' : 'text-green-600' }}">{{ number_format($bahan->stok) }} {{ $bahan->satuan }}</span>
                     </div>
@@ -215,47 +192,41 @@
         <div id="modal-content" class="bg-white w-full max-w-sm rounded-[3rem] shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
             <div class="bg-orange-500 p-8 text-white text-center">
                 <div class="text-4xl mb-2">☕</div>
-                <h2 class="text-2xl font-black uppercase">Street Coffee</h2>
-                <p class="text-[10px] font-bold opacity-60 uppercase tracking-widest">Digital Receipt</p>
+                <h2 class="text-2xl font-black uppercase tracking-tighter">Street Coffee</h2>
+                <p class="text-[10px] font-bold opacity-60 uppercase tracking-widest">Transaksi Berhasil</p>
             </div>
             <div class="p-8 space-y-4 text-xs font-mono text-gray-600">
                 <div class="flex justify-between border-b border-dashed pb-2"><span>Customer:</span><span id="receipt-customer" class="font-black text-gray-900 uppercase"></span></div>
                 <div class="flex justify-between border-b border-dashed pb-2"><span>Metode:</span><span id="receipt-method" class="font-black text-gray-900 uppercase"></span></div>
                 <div id="receipt-cash-details" class="hidden">
-                    <div class="flex justify-between border-b border-dashed pb-2 text-gray-400"><span>Uang Bayar:</span><span id="receipt-pay" class="font-bold"></span></div>
+                    <div class="flex justify-between border-b border-dashed pb-2 text-gray-400"><span>Bayar:</span><span id="receipt-pay" class="font-bold"></span></div>
                     <div class="flex justify-between border-b border-dashed pb-2 text-gray-400"><span>Kembalian:</span><span id="receipt-change" class="font-bold text-orange-600"></span></div>
                 </div>
                 <div id="receipt-items" class="py-2 space-y-2 max-h-40 overflow-y-auto pr-1"></div>
                 <div class="border-t-4 pt-6 flex justify-between text-lg font-black text-gray-900 uppercase"><span>TOTAL</span><span id="receipt-total" class="text-orange-600"></span></div>
             </div>
-            <div class="p-8 pt-0"><button onclick="window.location.reload()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black hover:bg-black transition-all">Selesai</button></div>
+            <div class="p-8 pt-0"><button onclick="window.location.reload()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black hover:bg-black transition-all uppercase tracking-widest shadow-xl">Selesai</button></div>
         </div>
     </div>
 
     <script>
         let cart = [];
-        
-        // INGATAN DIGITAL: Periksa apakah shift sudah aktif saat halaman dibuka
-        window.addEventListener('DOMContentLoaded', (event) => {
-            const isShiftActive = localStorage.getItem('shift_active');
-            if (!isShiftActive) {
-                const shiftModal = document.getElementById('shift-modal');
-                shiftModal.classList.replace('hidden', 'flex');
+
+        // 1. INGATAN SHIFT (Cek saat halaman dibuka)
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('shift_active')) {
+                document.getElementById('shift-modal').classList.replace('hidden', 'flex');
             }
         });
 
         function startShift() {
             const amount = document.getElementById('opening-cash').value;
             if(!amount || amount < 0) return alert('Input uang modal dulu ya!');
-            
-            // Simpan ingatan bahwa shift sudah dimulai
             localStorage.setItem('shift_active', 'true');
-            localStorage.setItem('opening_cash_value', amount);
-            
             document.getElementById('shift-modal').classList.replace('flex', 'hidden');
         }
 
-        // TAB SWITCHING
+        // 2. TAB SWITCHING (ADMIN ONLY)
         function switchTab(target) {
             const pos = document.getElementById('section-pos');
             const rekap = document.getElementById('section-rekap');
@@ -273,7 +244,23 @@
             }
         }
 
-        // GUDANG
+        // 3. FITUR LAPORAN (REPORT)
+        function filterReport() {
+            const start = document.getElementById('date-start').value;
+            const end = document.getElementById('date-end').value;
+
+            if(!start || !end) return alert('Pilih rentang tanggal dulu, Tiara!');
+
+            fetch(`/get-report?start_date=${start}&end_date=${end}`)
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('rekap-total-display').innerText = "Rp " + data.total_omzet.toLocaleString();
+                    if(data.total_order === 0) alert('Belum ada penjualan di tanggal ini.');
+                })
+                .catch(() => alert('Gangguan koneksi!'));
+        }
+
+        // 4. GUDANG MODAL & SEARCH
         const invModal = document.getElementById('inventory-modal');
         document.getElementById('open-inventory').addEventListener('click', () => invModal.classList.remove('hidden'));
         document.getElementById('close-inventory').addEventListener('click', () => invModal.classList.add('hidden'));
@@ -286,7 +273,7 @@
             });
         });
 
-        // KERANJANG & CHECKOUT
+        // 5. KERANJANG & CHECKOUT
         const paymentMethod = document.getElementById('payment-method');
         const cashInput = document.getElementById('cash-amount');
         const changeDisplay = document.getElementById('change-amount');
@@ -302,7 +289,7 @@
             const bayar = parseInt(this.value) || 0;
             const kembalian = bayar - total;
             changeDisplay.innerText = "Rp " + (kembalian >= 0 ? kembalian.toLocaleString() : "0");
-            btnPay.disabled = (bayar < total);
+            btnPay.disabled = (this.value === '' || (this.value !== '' && kembalian < 0));
         });
 
         document.querySelectorAll('.add-to-cart').forEach(btn => {
@@ -321,7 +308,7 @@
             const totalDisplay = document.getElementById('cart-total');
 
             if(cart.length === 0) {
-                container.innerHTML = `<div class="flex flex-col items-center justify-center text-gray-300 italic text-sm py-10"><p>Pesanan kosong...</p></div>`;
+                container.innerHTML = `<div class="flex flex-col items-center justify-center text-gray-300 italic py-10"><p>Pesanan kosong...</p></div>`;
                 totalDisplay.innerText = "Rp 0"; btnPay.disabled = true; return;
             }
 
@@ -361,7 +348,7 @@
             const name = document.getElementById('customer-name').value;
             const method = paymentMethod.value;
             const totalVal = parseInt(document.getElementById('cart-total').innerText.replace(/[^0-9]/g,''));
-            if(!name) return alert('⚠️ Tulis nama pelanggan dulu!');
+            if(!name) return alert('⚠️ Tulis nama pelanggan!');
             this.disabled = true; this.innerText = 'WAIT...';
 
             fetch("{{ route('checkout') }}", {
@@ -385,7 +372,7 @@
                     document.getElementById('receipt-items').innerHTML = itemsHtml;
                     document.getElementById('receipt-modal').classList.remove('hidden');
                     setTimeout(() => document.getElementById('modal-content').classList.replace('opacity-0','opacity-100'), 50);
-                } else alert('Eror: ' + data.message);
+                } else alert('Gagal: ' + data.message);
             });
         });
     </script>

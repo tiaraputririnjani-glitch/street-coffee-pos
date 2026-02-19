@@ -8,7 +8,7 @@ use App\Models\Recipe;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth; // Tambahkan ini
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class TransaksiController extends Controller
@@ -21,20 +21,20 @@ class TransaksiController extends Controller
         $menus = Menu::all();
         $stokBahan = BahanBaku::all();
         
-        // Ambil 10 transaksi terbaru agar muncul di tabel Riwayat Dashboard
+        // Ambil 10 transaksi terbaru agar muncul di tabel Riwayat
         $riwayat = Transaksi::orderBy('created_at', 'desc')->take(10)->get();
         
+        // Hitung omzet hari ini saja untuk dashboard utama
         $pendapatan = Transaksi::whereDate('created_at', today())->sum('total_harga');
 
         return view('dashboard', compact('menus', 'stokBahan', 'pendapatan', 'riwayat'));
     }
 
     /**
-     * Menyimpan Transaksi (Nama fungsi diganti jadi 'checkout' agar sinkron dengan route)
+     * Menyimpan Transaksi
      */
     public function checkout(Request $request)
     {
-        // 1. Validasi data
         $request->validate([
             'nama_customer' => 'required',
             'metode_pembayaran' => 'required',
@@ -44,14 +44,12 @@ class TransaksiController extends Controller
 
         return DB::transaction(function () use ($request) {
             try {
-                // 2. Gabungkan nama menu jadi teks untuk kolom 'item_list'
                 $daftarPesanan = collect($request->items)->map(function($item) {
                     return $item['name'] . " (" . $item['qty'] . "x)";
                 })->implode(', ');
 
-                // 3. Simpan Transaksi Utama (Gunakan auth()->id() agar sesuai siapa yang login)
                 $transaksi = Transaksi::create([
-                    'user_id' => Auth::id(), // <--- BUKAN lagi angka 1, tapi ID yang sedang login
+                    'user_id' => Auth::id(),
                     'nama_customer' => $request->nama_customer,
                     'metode_pembayaran' => $request->metode_pembayaran,
                     'item_list' => $daftarPesanan,
@@ -59,10 +57,8 @@ class TransaksiController extends Controller
                     'created_at' => now()
                 ]);
 
-                // 4. Potong Stok Bahan Baku Berdasarkan Resep
                 foreach ($request->items as $item) {
                     $recipes = Recipe::where('menu_id', $item['id'])->get();
-                    
                     foreach ($recipes as $recipe) {
                         BahanBaku::where('id', $recipe->bahan_id)
                             ->decrement('stok', $recipe->jumlah_terpakai * $item['qty']);
@@ -81,5 +77,24 @@ class TransaksiController extends Controller
                 ], 500);
             }
         });
+    }
+
+    /**
+     * FITUR LAPORAN (Baru & Sudah Diperbaiki)
+     */
+    public function getReport(Request $request) 
+    {
+        // Pastikan format tanggal benar
+        $start = $request->start_date . " 00:00:00";
+        $end = $request->end_date . " 23:59:59";
+
+        // Cari transaksi di antara tanggal yang dipilih
+        $transaksi = Transaksi::whereBetween('created_at', [$start, $end])->get();
+
+        return response()->json([
+            'total_omzet' => $transaksi->sum('total_harga'),
+            'total_order' => $transaksi->count(),
+            'data' => $transaksi
+        ]);
     }
 }
